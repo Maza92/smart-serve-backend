@@ -13,12 +13,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/cash")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('USER')")
 public class CashRegisterController implements ICashRegisterController {
 
     private final ICashRegisterService cashRegisterService;
 
     @Override
-    @PreAuthorize("hasRole('CASHIER')")
     public String createCashRegister(CashRegisterCreateDto cashRegisterCreateDto) {
         return "Cash register created successfully";
     }

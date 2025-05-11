@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Cash", description = "Cash Operations API")
 public interface ICashRegisterController {
 
+    @AcceptLanguageHeader
     @SecurityRequirement(name = "Auth")
     @PostMapping("/create")
     String createCashRegister(@RequestBody CashRegisterCreateDto cashRegisterCreateDto);
