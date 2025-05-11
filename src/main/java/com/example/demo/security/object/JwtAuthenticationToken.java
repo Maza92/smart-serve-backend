@@ -31,6 +31,14 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 		setAuthenticated(true);
 	}
 
+	public JwtAuthenticationToken(String token, Claims claims,
+			Collection<? extends GrantedAuthority> authorities) {
+		super(authorities);
+		this.token = token;
+		this.claims = claims;
+		setAuthenticated(true);
+	}
+
 	@Override
 	public Object getCredentials() {
 		return token;
