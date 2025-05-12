@@ -33,6 +33,18 @@ public class SecurityContextService implements ISecurityContextService {
         return getClaims().getSubject();
     }
 
+    public Integer getSubjectAsInt() {
+        String subject = getSubject();
+        if (subject == null) {
+            throw apiExceptionFactory.authException("auth.token.invalid");
+        }
+        try {
+            return Integer.parseInt(subject);
+        } catch (NumberFormatException e) {
+            throw apiExceptionFactory.authException("auth.token.invalid");
+        }
+    }
+
     public String getEmail() {
         return getClaims().get("email", String.class);
     }

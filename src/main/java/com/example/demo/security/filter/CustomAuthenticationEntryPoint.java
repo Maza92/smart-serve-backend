@@ -7,7 +7,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.dto.ApiErrorDto;
+import com.example.demo.dto.api.ApiErrorDto;
 import com.example.demo.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -4,9 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public class CashRegisterCreateDto {
+@Data
+public class PartialCreateCashRegisterDto {
     @NotNull(message = "{validation.cash.register.notes.notNull}")
     @NotBlank(message = "{validation.cash.register.notes.notBlank}")
     @Size(min = 1, max = 500, message = "{validation.cash.register.notes.size}")

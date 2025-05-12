@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import com.example.demo.dto.ApiErrorDto;
+import com.example.demo.dto.api.ApiErrorDto;
 import com.example.demo.exception.base.BaseException;
 import com.example.demo.exception.exceptions.AlreadyExistsException;
 import com.example.demo.exception.exceptions.AuthException;
+import com.example.demo.exception.exceptions.BadRequestException;
 import com.example.demo.exception.exceptions.BusinessException;
 import com.example.demo.exception.exceptions.EntityException;
 import com.example.demo.exception.exceptions.EntityNotFoundException;
@@ -123,6 +124,8 @@ public class GlobalExceptionHandler {
 		} else if (ex instanceof ValidationException) {
 			return HttpStatus.BAD_REQUEST;
 		} else if (ex instanceof BusinessException) {
+			return HttpStatus.BAD_REQUEST;
+		} else if (ex instanceof BadRequestException) {
 			return HttpStatus.BAD_REQUEST;
 		}
 		return HttpStatus.INTERNAL_SERVER_ERROR;

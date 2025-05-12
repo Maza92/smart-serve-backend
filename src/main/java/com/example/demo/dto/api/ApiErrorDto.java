@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.dto.api;
 
 import java.time.Instant;
 import java.util.List;

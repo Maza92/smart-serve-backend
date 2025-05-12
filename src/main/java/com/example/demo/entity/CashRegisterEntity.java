@@ -1,7 +1,7 @@
 package com.example.demo.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 import com.example.demo.enums.CashRegisterEnum;
@@ -28,11 +28,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Builder
+@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "cash_register")
@@ -48,11 +50,11 @@ public class CashRegisterEntity extends BaseAuditEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "open_date", nullable = false)
-    private LocalDateTime openDate;
+    @Column(name = "open_date")
+    private Instant openDate;
 
     @Column(name = "close_date")
-    private LocalDateTime closeDate;
+    private Instant closeDate;
 
     @Column(name = "initial_amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal initialAmount;
@@ -85,15 +87,15 @@ public class CashRegisterEntity extends BaseAuditEntity {
 
     @PrePersist
     public void prePersist() {
-        if (openDate == null) {
-            openDate = LocalDateTime.now();
+        super.prePersist();
+
+        if (status == null) {
+            status = CashRegisterEnum.CREATED;
         }
     }
 
     @PreUpdate
     public void preUpdate() {
-        if (closeDate != null && finalAmount != null && expectedAmount != null) {
-            difference = finalAmount.subtract(expectedAmount);
-        }
+        super.preUpdate();
     }
 }

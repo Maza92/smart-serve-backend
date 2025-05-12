@@ -11,6 +11,8 @@ public interface ISecurityContextService {
 
     String getSubject();
 
+    Integer getSubjectAsInt();
+
     String getEmail();
 
     boolean hasRole(String role);

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.exception.exceptions.AlreadyExistsException;
 import com.example.demo.exception.exceptions.AuthException;
+import com.example.demo.exception.exceptions.BadRequestException;
 import com.example.demo.exception.exceptions.BusinessException;
 import com.example.demo.exception.exceptions.EntityException;
 import com.example.demo.exception.exceptions.EntityNotFoundException;
@@ -40,5 +41,9 @@ public class ApiExceptionFactory {
 
 	public BusinessException businessException(String messageKey, Object... args) {
 		return new BusinessException(messageKey, localeUtils.getCurrentLocale(), args);
+	}
+
+	public BadRequestException badRequestException(String messageKey, Object... args) {
+		return new BadRequestException(messageKey, localeUtils.getCurrentLocale(), args);
 	}
 }

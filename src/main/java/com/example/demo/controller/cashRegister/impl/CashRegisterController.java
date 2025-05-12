@@ -1,11 +1,17 @@
 package com.example.demo.controller.cashRegister.impl;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.controller.cashRegister.ICashRegisterController;
-import com.example.demo.dto.cashRegister.CashRegisterCreateDto;
+import com.example.demo.dto.api.ApiSuccessDto;
+import com.example.demo.dto.cashRegister.ClosedCashRegisterDto;
+import com.example.demo.dto.cashRegister.OpenCashRegisterDto;
+import com.example.demo.dto.cashRegister.PartialCreateCashRegisterDto;
 import com.example.demo.service.cashRegister.ICashRegisterService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +25,20 @@ public class CashRegisterController implements ICashRegisterController {
     private final ICashRegisterService cashRegisterService;
 
     @Override
-    public String createCashRegister(CashRegisterCreateDto cashRegisterCreateDto) {
-        return "Cash register created successfully";
+    public ResponseEntity<ApiSuccessDto<Void>> createCashRegister(PartialCreateCashRegisterDto cashRegisterCreateDto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(cashRegisterService.createPartialCashRegister(cashRegisterCreateDto));
+    }
+
+    @Override
+    public ResponseEntity<ApiSuccessDto<Void>> openCashRegister(OpenCashRegisterDto cashRegisterCreateDto,
+            Integer cashRegisterId) {
+        return ResponseEntity.ok(cashRegisterService.OpenCashRegister(cashRegisterCreateDto, cashRegisterId));
+    }
+
+    @Override
+    public ResponseEntity<ApiSuccessDto<Void>> closeCashRegister(ClosedCashRegisterDto cashRegisterCreateDto,
+            Integer cashRegisterId) {
+        return ResponseEntity.ok(cashRegisterService.CloseCashRegister(cashRegisterCreateDto, cashRegisterId));
     }
 }
