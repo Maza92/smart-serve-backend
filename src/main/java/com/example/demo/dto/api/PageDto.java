@@ -21,11 +21,11 @@ public class PageDto<T> {
     private int totalPages;
     private boolean first;
     private boolean last;
-    
+
     public static <T> PageDto<T> fromPage(Page<?> page, List<T> content) {
         return new PageDto<T>()
                 .setContent(content)
-                .setPageNumber(page.getNumber())
+                .setPageNumber(page.getNumber() + 1)
                 .setPageSize(page.getSize())
                 .setTotalElements(page.getTotalElements())
                 .setTotalPages(page.getTotalPages())

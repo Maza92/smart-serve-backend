@@ -23,16 +23,33 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController implements IUserController {
 
     private final IUserService userService;
-    
+
     @Override
     public ResponseEntity<ApiSuccessDto<PageDto<UserDto>>> getUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(userService.getAllUsers(page, size));
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String role,
+            @RequestParam(defaultValue = "username") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+
+        return ResponseEntity.ok(userService.getAllUsers(page, size, search, status, role, sortBy, sortDirection));
+    }
+
+    @Override
+    public ResponseEntity<ApiSuccessDto<UserDto>> getUserById(int id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @Override
+    public ResponseEntity<ApiSuccessDto<UserDto>> updateUser(int id,
+            UserDto userDto) {
+        return ResponseEntity.ok(userService.updateUser(id, userDto));
     }
 
 }
