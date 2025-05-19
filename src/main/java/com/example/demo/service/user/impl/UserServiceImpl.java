@@ -47,10 +47,10 @@ public class UserServiceImpl implements IUserService {
             String sortDirection) {
 
         if (size <= 0)
-            throw apiExceptionFactory.badRequestException("operation.user.get.all.invalid.page.size");
+            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
 
         if (page <= 0)
-            throw apiExceptionFactory.badRequestException("operation.user.get.all.invalid.page.number");
+            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
 
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(Math.max(page - 1, 0), size, sort);
@@ -74,8 +74,6 @@ public class UserServiceImpl implements IUserService {
         List<UserDto> usersDto = users.getContent().stream()
                 .map(userMapper::toDto)
                 .toList();
-
-        System.out.println(usersDto);
 
         return ApiSuccessDto.of(HttpStatus.OK.value(), messageUtils.getMessage("operation.user.get.all.success"),
                 PageDto.fromPage(users, usersDto));

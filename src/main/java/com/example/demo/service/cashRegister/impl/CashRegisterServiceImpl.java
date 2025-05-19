@@ -4,11 +4,15 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.api.ApiSuccessDto;
+import com.example.demo.dto.api.PageDto;
 import com.example.demo.dto.cashRegister.PartialCreateCashRegisterDto;
+import com.example.demo.dto.cashRegister.CashRegisterDto;
 import com.example.demo.dto.cashRegister.ClosedCashRegisterDto;
 import com.example.demo.dto.cashRegister.OpenCashRegisterDto;
 import com.example.demo.entity.CashRegisterEntity;
@@ -33,11 +37,6 @@ public class CashRegisterServiceImpl implements ICashRegisterService {
     private final MessageUtils messageUtils;
 
     private final ICashRegisterMapper cashRegisterMapper;
-
-    @Override
-    public List<CashRegisterEntity> getAllCashRegisters() {
-        return cashRegisterRepository.findAll();
-    }
 
     /**
      * Creates a minimal cash register entry with just the notes information.
@@ -161,5 +160,25 @@ public class CashRegisterServiceImpl implements ICashRegisterService {
 
         return ApiSuccessDto.of(HttpStatus.OK.value(), messageUtils.getMessage("operation.cash.register.updated"),
                 null);
+    }
+
+    @Override
+    public ApiSuccessDto<PageDto<CashRegisterDto>> getAllCashRegisters(int page, int size) {
+        if (size <= 0)
+            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
+
+        if (page <= 0)
+            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
+
+        Pageable pageable = Pageable.ofSize(size).withPage(Math.max(page - 1, 0));
+        Page<CashRegisterEntity> cashRegisters = cashRegisterRepository.findAll(pageable);
+
+        List<CashRegisterDto> cashRegistersDto = cashRegisters.getContent().stream()
+                .map(cashRegisterMapper::toDto)
+                .toList();
+
+        return ApiSuccessDto.of(HttpStatus.OK.value(),
+                messageUtils.getMessage("operation.cash.register.get.all.success"),
+                PageDto.fromPage(cashRegisters, cashRegistersDto));
     }
 }

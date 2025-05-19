@@ -3,6 +3,7 @@ package com.example.demo.mappers;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import com.example.demo.dto.cashRegister.CashRegisterDto;
 import com.example.demo.dto.cashRegister.ClosedCashRegisterDto;
 import com.example.demo.dto.cashRegister.OpenCashRegisterDto;
 import com.example.demo.entity.CashRegisterEntity;
@@ -34,4 +35,8 @@ public interface ICashRegisterMapper {
     @Mapping(target = "transactions", ignore = true)
     @Mapping(target = "cashMovements", ignore = true)
     void updateToClose(@MappingTarget CashRegisterEntity entity, ClosedCashRegisterDto dto);
+
+    @Mapping(target = "user", source = "user.username")
+    CashRegisterDto toDto(CashRegisterEntity entity);
+
 }
