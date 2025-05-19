@@ -39,7 +39,7 @@ public class JwtTokenEntity extends BaseAuditEntity {
 	@Column(name = "id", nullable = false)
 	private Integer id;
 
-	@Column(name = "token", nullable = false, length = Integer.MAX_VALUE)
+	@Column(name = "token", nullable = false, columnDefinition = "TEXT")
 	private String token;
 
 	@Column(name = "token_type", nullable = false)
@@ -69,6 +69,6 @@ public class JwtTokenEntity extends BaseAuditEntity {
 	@ToString.Exclude
 	private UserEntity userEntity;
 
-	@Column(name = "jti", nullable = false)
+	@Column(name = "jti", nullable = false, columnDefinition = "TEXT")
 	private String jti;
 }

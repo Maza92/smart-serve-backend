@@ -18,7 +18,7 @@ import com.example.demo.service.cashRegister.ICashRegisterService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/cash")
+@RequestMapping("/cash")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('USER')")
 public class CashRegisterController implements ICashRegisterController {
