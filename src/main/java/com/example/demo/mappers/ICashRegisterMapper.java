@@ -8,7 +8,7 @@ import com.example.demo.dto.cashRegister.ClosedCashRegisterDto;
 import com.example.demo.dto.cashRegister.OpenCashRegisterDto;
 import com.example.demo.entity.CashRegisterEntity;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.IGNORE, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.IGNORE, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, uses = DateMapper.class)
 public interface ICashRegisterMapper {
     ICashRegisterMapper INSTANCE = Mappers.getMapper(ICashRegisterMapper.class);
 
@@ -37,6 +37,7 @@ public interface ICashRegisterMapper {
     void updateToClose(@MappingTarget CashRegisterEntity entity, ClosedCashRegisterDto dto);
 
     @Mapping(target = "user", source = "user.username")
+    @Mapping(target = "createdAt", source = "createdAt")
     CashRegisterDto toDto(CashRegisterEntity entity);
 
 }

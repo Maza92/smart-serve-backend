@@ -2,9 +2,13 @@ package com.example.demo.entity;
 
 import java.util.Set;
 
+import com.example.demo.enums.RestaurantTableEnum;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,10 +21,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Data
 @Entity
-@Builder
+@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "restaurant_table")
@@ -38,8 +43,9 @@ public class RestaurantTableEntity {
     @Column(name = "capacity", nullable = false)
     private Integer capacity;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private String status;
+    private RestaurantTableEnum status;
 
     @Column(name = "section", length = 50)
     private String section;

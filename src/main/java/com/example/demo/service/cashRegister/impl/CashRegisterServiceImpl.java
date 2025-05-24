@@ -2,7 +2,9 @@ package com.example.demo.service.cashRegister.impl;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,11 +53,22 @@ public class CashRegisterServiceImpl implements ICashRegisterService {
      * </ul>
      * 
      * @param cashRegister
-     *            The DTO containing only the notes required for minimal creation
+     *                     The DTO containing only the notes required for minimal
+     *                     creation
      * @return An ApiSuccessDto with the creation status
      */
     @Override
     public ApiSuccessDto<Void> createPartialCashRegister(PartialCreateCashRegisterDto cashRegister) {
+
+        if (cashRegisterRepository.existsOpenedCashRegister()) {
+            throw apiExceptionFactory.badRequestException("operation.cash.register.already.opened");
+        }
+
+        long createdToday = cashRegisterRepository.countCreatedToday();
+        if (createdToday >= 3) {
+            throw apiExceptionFactory.badRequestException("operation.cash.register.max.created.per.day");
+        }
+
         CashRegisterEntity newCashRegister = new CashRegisterEntity()
                 .setUser(new UserEntity()
                         .setId(securityContextService.getSubjectAsInt()))
@@ -84,17 +97,24 @@ public class CashRegisterServiceImpl implements ICashRegisterService {
      * </ul>
      * 
      * @param cashRegister
-     *            The DTO containing data required to open the cash register
+     *                     The DTO containing data required to open the cash
+     *                     register
      * @param id
-     *            The unique identifier of the cash register to open
+     *                     The unique identifier of the cash register to open
      * @return An ApiSuccessDto containing the operation result
      * @throws EntityNotFoundException
-     *             if the cash register with the given ID doesn't exist
+     *                                 if the cash register with the given ID
+     *                                 doesn't exist
      * @throws BadRequestException
-     *             if the cash register is already closed
+     *                                 if the cash register is already closed
      */
     @Override
     public ApiSuccessDto<Void> OpenCashRegister(OpenCashRegisterDto cashRegister, Integer id) {
+
+        if (cashRegisterRepository.existsOpenedCashRegister()) {
+            throw apiExceptionFactory.badRequestException("operation.cash.register.already.opened");
+        }
+
         CashRegisterEntity existingCashRegister = cashRegisterRepository.findById(id)
                 .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.cash.register.not.found"));
 
@@ -135,14 +155,16 @@ public class CashRegisterServiceImpl implements ICashRegisterService {
      * </pre>
      * 
      * @param cashRegister
-     *            The DTO containing data required to close the cash register
+     *                     The DTO containing data required to close the cash
+     *                     register
      * @param id
-     *            The unique identifier of the cash register to close
+     *                     The unique identifier of the cash register to close
      * @return An ApiSuccessDto containing the operation result
      * @throws EntityNotFoundException
-     *             if the cash register with the given ID doesn't exist
+     *                                 if the cash register with the given ID
+     *                                 doesn't exist
      * @throws BadRequestException
-     *             if the cash register is already closed
+     *                                 if the cash register is already closed
      */
     public ApiSuccessDto<Void> CloseCashRegister(ClosedCashRegisterDto cashRegister, Integer id) {
         CashRegisterEntity existingCashRegister = cashRegisterRepository.findById(id)
@@ -162,6 +184,17 @@ public class CashRegisterServiceImpl implements ICashRegisterService {
                 null);
     }
 
+    /**
+     * Retrieves a paginated list of all cash registers in the system.
+     * 
+     * Validates the page and size parameters to ensure they are positive integers.
+     * Converts the result to DTOs and wraps it in a pagination structure.
+     * 
+     * @param page the page number to retrieve (1-based)
+     * @param size the number of items per page
+     * @return a successful response containing a paginated list of cash registers
+     * @throws BadRequestException if the page or size parameters are invalid
+     */
     @Override
     public ApiSuccessDto<PageDto<CashRegisterDto>> getAllCashRegisters(int page, int size) {
         if (size <= 0)
@@ -180,5 +213,84 @@ public class CashRegisterServiceImpl implements ICashRegisterService {
         return ApiSuccessDto.of(HttpStatus.OK.value(),
                 messageUtils.getMessage("operation.cash.register.get.all.success"),
                 PageDto.fromPage(cashRegisters, cashRegistersDto));
+    }
+
+    /**
+     * Retrieves the current status of today's cash register activity.
+     * 
+     * The method checks today's cash register records in the following order of
+     * precedence:
+     * <ol>
+     * <li>If any register is OPENED, returns {@code CashRegisterEnum.OPENED}</li>
+     * <li>If none are opened but at least one is CREATED, returns
+     * {@code CashRegisterEnum.CREATED}</li>
+     * <li>If none are created but at least one is CLOSED, returns
+     * {@code CashRegisterEnum.CLOSED}</li>
+     * <li>If no register activity is found for today, returns
+     * {@code CashRegisterEnum.NONE}</li>
+     * </ol>
+     * 
+     * @return an ApiSuccessDto containing the current cash register status for
+     *         today
+     */
+    @Override
+    public ApiSuccessDto<CashRegisterEnum> getCashRegisterStatus() {
+        List<CashRegisterEntity> openedToday = cashRegisterRepository.findOpenedToday();
+        if (!openedToday.isEmpty()) {
+            return ApiSuccessDto.of(HttpStatus.OK.value(),
+                    messageUtils.getMessage("operation.cash.register.get.status.success"),
+                    CashRegisterEnum.OPENED);
+        }
+
+        List<CashRegisterEntity> createdToday = cashRegisterRepository.findCreatedToday();
+        if (!createdToday.isEmpty()) {
+            return ApiSuccessDto.of(HttpStatus.OK.value(),
+                    messageUtils.getMessage("operation.cash.register.get.status.created"),
+                    CashRegisterEnum.CREATED);
+        }
+
+        List<CashRegisterEntity> closedToday = cashRegisterRepository.findClosedToday();
+        if (!closedToday.isEmpty()) {
+            return ApiSuccessDto.of(HttpStatus.OK.value(),
+                    messageUtils.getMessage("operation.cash.register.get.status.success"),
+                    CashRegisterEnum.CLOSED);
+        }
+
+        return ApiSuccessDto.of(HttpStatus.OK.value(),
+                messageUtils.getMessage("operation.cash.register.get.status.none"),
+                CashRegisterEnum.NONE);
+    }
+
+    @Override
+    public ApiSuccessDto<CashRegisterDto> getCurrentOpenedCashRegister() {
+        Optional<CashRegisterEntity> openedRegister = cashRegisterRepository.findCurrentOpenedCashRegister();
+
+        if (openedRegister.isEmpty()) {
+            throw apiExceptionFactory.entityNotFound("operation.cash.register.no.opened.found");
+        }
+
+        CashRegisterDto dto = cashRegisterMapper.toDto(openedRegister.get());
+        return ApiSuccessDto.of(HttpStatus.OK.value(),
+                messageUtils.getMessage("operation.cash.register.current.found"),
+                dto);
+    }
+
+    @Override
+    public ApiSuccessDto<List<CashRegisterDto>> getAvailableCashRegistersToOpen() {
+        List<CashRegisterEntity> availableRegisters = cashRegisterRepository.findAvailableCashRegistersToOpen();
+
+        if (availableRegisters.isEmpty()) {
+            return ApiSuccessDto.of(HttpStatus.OK.value(),
+                    messageUtils.getMessage("operation.cash.register.no.available"),
+                    new ArrayList<>());
+        }
+
+        List<CashRegisterDto> dtos = availableRegisters.stream()
+                .map(cashRegisterMapper::toDto)
+                .toList();
+
+        return ApiSuccessDto.of(HttpStatus.OK.value(),
+                messageUtils.getMessage("operation.cash.register.available.found"),
+                dtos);
     }
 }

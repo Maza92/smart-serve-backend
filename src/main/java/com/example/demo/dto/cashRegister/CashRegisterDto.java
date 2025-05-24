@@ -9,4 +9,5 @@ public class CashRegisterDto {
     public String finalAmount;
     public String notes;
     public String status;
+    public String createdAt;
 }

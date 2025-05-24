@@ -1,11 +1,5 @@
 package com.example.demo.controller.user.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,12 +17,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class UserController implements IUserController {
 
     private final IUserService userService;
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiSuccessDto<PageDto<UserDto>>> getUsers(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -42,11 +36,13 @@ public class UserController implements IUserController {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<ApiSuccessDto<UserDto>> getUserById(int id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiSuccessDto<UserDto>> updateUser(int id,
             UserDto userDto) {
         return ResponseEntity.ok(userService.updateUser(id, userDto));

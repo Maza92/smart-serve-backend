@@ -1,5 +1,7 @@
 package com.example.demo.controller.cashRegister.impl;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +15,7 @@ import com.example.demo.dto.cashRegister.CashRegisterDto;
 import com.example.demo.dto.cashRegister.ClosedCashRegisterDto;
 import com.example.demo.dto.cashRegister.OpenCashRegisterDto;
 import com.example.demo.dto.cashRegister.PartialCreateCashRegisterDto;
+import com.example.demo.enums.CashRegisterEnum;
 import com.example.demo.service.cashRegister.ICashRegisterService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/cash")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasRole('CASHIER') or hasRole('ADMIN')")
 public class CashRegisterController implements ICashRegisterController {
 
     private final ICashRegisterService cashRegisterService;
@@ -46,5 +49,20 @@ public class CashRegisterController implements ICashRegisterController {
     @Override
     public ResponseEntity<ApiSuccessDto<PageDto<CashRegisterDto>>> getAllCashRegisters(int page, int size) {
         return ResponseEntity.ok(cashRegisterService.getAllCashRegisters(page, size));
+    }
+
+    @Override
+    public ResponseEntity<ApiSuccessDto<CashRegisterEnum>> getCashRegisterStatus() {
+        return ResponseEntity.ok(cashRegisterService.getCashRegisterStatus());
+    }
+
+    @Override
+    public ResponseEntity<ApiSuccessDto<CashRegisterDto>> getCurrentOpenedCashRegister() {
+        return ResponseEntity.ok(cashRegisterService.getCurrentOpenedCashRegister());
+    }
+
+    @Override
+    public ResponseEntity<ApiSuccessDto<List<CashRegisterDto>>> getAvailableCashRegistersToOpen() {
+        return ResponseEntity.ok(cashRegisterService.getAvailableCashRegistersToOpen());
     }
 }
