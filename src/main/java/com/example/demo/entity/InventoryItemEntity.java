@@ -19,11 +19,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Builder
+@Accessors(chain = true)
+@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "inventory_item")
 public class InventoryItemEntity extends BaseAuditEntity {
@@ -68,6 +72,8 @@ public class InventoryItemEntity extends BaseAuditEntity {
 
     @PrePersist
     public void prePersist() {
+        super.prePersist();
+
         if (isActive == null) {
             isActive = true;
         }
@@ -76,6 +82,7 @@ public class InventoryItemEntity extends BaseAuditEntity {
 
     @PreUpdate
     public void preUpdate() {
+        super.preUpdate();
         lastUpdated = LocalDateTime.now();
     }
 }

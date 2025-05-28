@@ -4,7 +4,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.entity.UserEntity;
 import com.example.demo.exception.ApiExceptionFactory;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.security.object.JwtAuthenticationToken;
 import com.example.demo.service.securityContext.ISecurityContextService;
 
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityContextService implements ISecurityContextService {
 
     private final ApiExceptionFactory apiExceptionFactory;
+    private final UserRepository userRepository;
 
     public Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
@@ -56,5 +59,10 @@ public class SecurityContextService implements ISecurityContextService {
 
     public void setAuthentication(Authentication authentication) {
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    public UserEntity getUser() {
+        return userRepository.findById(getSubjectAsInt())
+                .orElseThrow(() -> apiExceptionFactory.authException("auth.token.invalid"));
     }
 }
