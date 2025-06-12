@@ -1,7 +1,7 @@
 package com.example.demo.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -61,10 +61,10 @@ public class InventoryItemEntity extends BaseAuditEntity {
     private String location;
 
     @Column(name = "last_updated")
-    private LocalDateTime lastUpdated;
+    private Instant lastUpdated;
 
     @Column(name = "expiry_date")
-    private LocalDateTime expiryDate;
+    private Instant expiryDate;
 
     @Column(name = "is_active", nullable = false)
     @Builder.Default
@@ -77,12 +77,12 @@ public class InventoryItemEntity extends BaseAuditEntity {
         if (isActive == null) {
             isActive = true;
         }
-        lastUpdated = LocalDateTime.now();
+        lastUpdated = Instant.now();
     }
 
     @PreUpdate
     public void preUpdate() {
         super.preUpdate();
-        lastUpdated = LocalDateTime.now();
+        lastUpdated = Instant.now();
     }
 }

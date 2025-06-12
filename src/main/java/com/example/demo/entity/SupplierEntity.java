@@ -60,6 +60,7 @@ public class SupplierEntity extends BaseAuditEntity {
 
     @PrePersist
     public void prePersist() {
+        super.prePersist();
         if (isActive == null) {
             isActive = true;
         }

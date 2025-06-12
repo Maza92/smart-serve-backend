@@ -21,8 +21,8 @@ public class SupplierController implements ISupplierController {
 
     @Override
     public ResponseEntity<ApiSuccessDto<PageDto<SupplierDto>>> getAllSuppliers(int page, int size, String search,
-            String sortBy, String sortDirection) {
-        return ResponseEntity.ok(supplierService.getAllSuppliers(page, size, search, sortBy, sortDirection));
+            String isActive, String sortBy, String sortDirection) {
+        return ResponseEntity.ok(supplierService.getAllSuppliers(page, size, search, sortBy, isActive, sortDirection));
     }
 
     @Override

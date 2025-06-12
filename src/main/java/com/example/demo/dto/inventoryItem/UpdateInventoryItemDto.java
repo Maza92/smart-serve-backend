@@ -1,7 +1,7 @@
 package com.example.demo.dto.inventoryItem;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -29,6 +29,6 @@ public class UpdateInventoryItemDto {
 
     private Integer supplierId;
     private String location;
-    private LocalDateTime expiryDate;
+    private Instant expiryDate;
     private Boolean isActive;
 }

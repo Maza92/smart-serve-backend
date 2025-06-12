@@ -7,7 +7,7 @@ import com.example.demo.dto.supplier.SupplierDto;
 import com.example.demo.dto.supplier.UpdateSupplierDto;
 
 public interface ISupplierService {
-    ApiSuccessDto<PageDto<SupplierDto>> getAllSuppliers(int page, int size, String search,
+    ApiSuccessDto<PageDto<SupplierDto>> getAllSuppliers(int page, int size, String search, String isActive,
             String sortBy, String sortDirection);
 
     ApiSuccessDto<SupplierDto> getSupplierById(int id);

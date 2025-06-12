@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -73,6 +74,7 @@ public class DishEntity extends BaseAuditEntity {
 
     @PrePersist
     public void prePersist() {
+        super.prePersist();
         if (isActive == null) {
             isActive = true;
         }
@@ -80,4 +82,5 @@ public class DishEntity extends BaseAuditEntity {
             isFeatured = false;
         }
     }
+
 }

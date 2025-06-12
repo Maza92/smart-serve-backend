@@ -36,7 +36,7 @@ public class SupplierServiceImpl implements ISupplierService {
 
         @Override
         public ApiSuccessDto<PageDto<SupplierDto>> getAllSuppliers(int page, int size, String search,
-                        String sortBy, String sortDirection) {
+                        String isActive, String sortBy, String sortDirection) {
 
                 if (size <= 0)
                         throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
@@ -53,6 +53,10 @@ public class SupplierServiceImpl implements ISupplierService {
                         spec = spec.or(SupplierSpecifications.nameContains(search))
                                         .or(SupplierSpecifications.contactPersonContains(search))
                                         .or(SupplierSpecifications.emailContains(search));
+                }
+
+                if (isActive != null && !isActive.isBlank()) {
+                        spec = spec.and(SupplierSpecifications.isActiveEquals(isActive));
                 }
 
                 Page<SupplierEntity> suppliers = supplierRepository.findAll(spec, pageable);

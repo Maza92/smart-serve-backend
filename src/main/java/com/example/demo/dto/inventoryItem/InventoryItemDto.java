@@ -1,7 +1,7 @@
 package com.example.demo.dto.inventoryItem;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,8 +26,8 @@ public class InventoryItemDto {
     private String supplierName;
     private Integer supplierId;
     private String location;
-    private LocalDateTime lastUpdated;
-    private LocalDateTime expiryDate;
+    private Instant lastUpdated;
+    private Instant expiryDate;
     private Boolean isActive;
     private String createdAt;
     private String updatedAt;
