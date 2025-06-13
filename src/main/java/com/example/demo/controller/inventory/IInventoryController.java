@@ -3,7 +3,7 @@ package com.example.demo.controller.inventory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.example.demo.controller.docBase.AcceptLanguageHeader;
+import com.example.demo.annotation.AcceptLanguageHeader;
 import com.example.demo.dto.api.ApiErrorDto;
 import com.example.demo.dto.api.ApiSuccessDto;
 import com.example.demo.dto.inventory.UpdateInventoryItemStockDto;

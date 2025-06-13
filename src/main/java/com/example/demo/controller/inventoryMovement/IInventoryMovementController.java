@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.demo.controller.docBase.AcceptLanguageHeader;
+import com.example.demo.annotation.AcceptLanguageHeader;
 import com.example.demo.dto.api.ApiErrorDto;
 import com.example.demo.dto.api.ApiSuccessDto;
 import com.example.demo.dto.api.PageDto;

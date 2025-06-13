@@ -1,4 +1,4 @@
-package com.example.demo.controller.docBase;
+package com.example.demo.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

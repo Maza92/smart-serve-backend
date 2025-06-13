@@ -1,16 +1,15 @@
 package com.example.demo.controller.supplier;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.demo.annotation.AcceptLanguageHeader;
 import com.example.demo.dto.api.ApiSuccessDto;
 import com.example.demo.dto.api.PageDto;
 import com.example.demo.dto.supplier.CreateSupplierDto;
@@ -37,6 +36,8 @@ public interface ISupplierController {
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
         })
         @GetMapping
+        @AcceptLanguageHeader
+        @SecurityRequirement(name = "Auth")
         ResponseEntity<ApiSuccessDto<PageDto<SupplierDto>>> getAllSuppliers(
                         @RequestParam(defaultValue = "1") int page,
                         @RequestParam(defaultValue = "10") int size,
@@ -55,6 +56,7 @@ public interface ISupplierController {
         })
         @GetMapping("/{id}")
         @SecurityRequirement(name = "Auth")
+        @AcceptLanguageHeader
         ResponseEntity<ApiSuccessDto<SupplierDto>> getSupplierById(@PathVariable int id);
 
         @Operation(summary = "Create supplier", description = "Create a new supplier")
@@ -66,7 +68,7 @@ public interface ISupplierController {
                         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
         })
         @PostMapping
-
+        @AcceptLanguageHeader
         @SecurityRequirement(name = "Auth")
         ResponseEntity<ApiSuccessDto<SupplierDto>> createSupplier(
                         @Valid @RequestBody CreateSupplierDto createSupplierDto);
@@ -82,6 +84,7 @@ public interface ISupplierController {
         })
         @PutMapping("/{id}")
         @SecurityRequirement(name = "Auth")
+        @AcceptLanguageHeader
         ResponseEntity<ApiSuccessDto<SupplierDto>> updateSupplier(@PathVariable int id,
                         @Valid @RequestBody UpdateSupplierDto updateSupplierDto);
 
@@ -95,5 +98,6 @@ public interface ISupplierController {
         })
         @DeleteMapping("/{id}")
         @SecurityRequirement(name = "Auth")
+        @AcceptLanguageHeader
         ResponseEntity<ApiSuccessDto<Void>> deleteSupplier(@PathVariable int id);
 }

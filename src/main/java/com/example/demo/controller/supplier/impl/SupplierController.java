@@ -1,6 +1,7 @@
 package com.example.demo.controller.supplier.impl;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.controller.supplier.ISupplierController;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/suppliers")
 public class SupplierController implements ISupplierController {
 
     private final ISupplierService supplierService;
@@ -22,7 +24,7 @@ public class SupplierController implements ISupplierController {
     @Override
     public ResponseEntity<ApiSuccessDto<PageDto<SupplierDto>>> getAllSuppliers(int page, int size, String search,
             String isActive, String sortBy, String sortDirection) {
-        return ResponseEntity.ok(supplierService.getAllSuppliers(page, size, search, sortBy, isActive, sortDirection));
+        return ResponseEntity.ok(supplierService.getAllSuppliers(page, size, search, isActive, sortBy, sortDirection));
     }
 
     @Override
