@@ -5,5 +5,6 @@ public enum RoleEnum {
     USER,
     CASHIER,
     WAITER,
-    COOK
+    COOK,
+    BAKER,
 }

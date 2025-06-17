@@ -28,6 +28,7 @@ public class UpdateInventoryItemDto {
     private BigDecimal minStockLevel;
 
     private Integer supplierId;
+    private Integer categoryId;
     private String location;
     private Instant expiryDate;
     private Boolean isActive;

@@ -57,6 +57,10 @@ public class InventoryItemEntity extends BaseAuditEntity {
     @JoinColumn(name = "supplier_id", nullable = false)
     private SupplierEntity supplier;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id", nullable = false)
+    private CategoryEntity category;
+
     @Column(name = "location", length = 100)
     private String location;
 

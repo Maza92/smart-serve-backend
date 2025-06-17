@@ -25,6 +25,7 @@ public class InventoryItemDto {
     private BigDecimal minStockLevel;
     private String supplierName;
     private Integer supplierId;
+    private Integer categoryId;
     private String location;
     private Instant lastUpdated;
     private Instant expiryDate;

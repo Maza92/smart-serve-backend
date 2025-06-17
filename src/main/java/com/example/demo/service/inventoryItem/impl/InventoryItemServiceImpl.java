@@ -16,10 +16,12 @@ import com.example.demo.dto.api.PageDto;
 import com.example.demo.dto.inventoryItem.CreateInventoryItemDto;
 import com.example.demo.dto.inventoryItem.InventoryItemDto;
 import com.example.demo.dto.inventoryItem.UpdateInventoryItemDto;
+import com.example.demo.entity.CategoryEntity;
 import com.example.demo.entity.InventoryItemEntity;
 import com.example.demo.entity.SupplierEntity;
 import com.example.demo.exception.ApiExceptionFactory;
 import com.example.demo.mappers.IInventoryItemMapper;
+import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.InventoryItemRepository;
 import com.example.demo.repository.SupplierRepository;
 import com.example.demo.service.inventoryItem.IInventoryItemService;
@@ -34,6 +36,7 @@ public class InventoryItemServiceImpl implements IInventoryItemService {
 
     private final InventoryItemRepository inventoryItemRepository;
     private final SupplierRepository supplierRepository;
+    private final CategoryRepository categoryRepository;
     private final IInventoryItemMapper inventoryItemMapper;
     private final MessageUtils messageUtils;
     private final ApiExceptionFactory apiExceptionFactory;
@@ -91,8 +94,12 @@ public class InventoryItemServiceImpl implements IInventoryItemService {
         SupplierEntity supplier = supplierRepository.findById(createDto.getSupplierId())
                 .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.supplier.not.found"));
 
+        CategoryEntity category = categoryRepository.findById(createDto.getCategoryId())
+                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.category.not.found"));
+
         InventoryItemEntity inventoryItem = inventoryItemMapper.toEntity(createDto);
         inventoryItem.setSupplier(supplier);
+        inventoryItem.setCategory(category);
         inventoryItem.setStockQuantity(BigDecimal.ZERO);
 
         InventoryItemEntity savedInventoryItem = inventoryItemRepository.save(inventoryItem);
@@ -109,10 +116,16 @@ public class InventoryItemServiceImpl implements IInventoryItemService {
 
         inventoryItemMapper.updateEntityFromDto(updateDto, inventoryItem);
 
-        if (updateDto.getSupplierId() != null) {
+        if (updateDto.getSupplierId() != inventoryItem.getSupplier().getId()) {
             SupplierEntity supplier = supplierRepository.findById(updateDto.getSupplierId())
                     .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.supplier.not.found"));
             inventoryItem.setSupplier(supplier);
+        }
+
+        if (updateDto.getCategoryId() != inventoryItem.getCategory().getId()) {
+            CategoryEntity category = categoryRepository.findById(updateDto.getCategoryId())
+                    .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.category.not.found"));
+            inventoryItem.setCategory(category);
         }
 
         InventoryItemEntity savedInventoryItem = inventoryItemRepository.save(inventoryItem);

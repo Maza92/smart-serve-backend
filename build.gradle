@@ -49,6 +49,8 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-common:2.6.0'
 	implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+	implementation 'org.apache.poi:poi:5.3.0'
+    implementation 'org.apache.poi:poi-ooxml:5.3.0'
 }
 
 tasks.named('test') {

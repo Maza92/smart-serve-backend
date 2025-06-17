@@ -14,6 +14,7 @@ public interface IInventoryItemMapper {
 
     @Mapping(target = "supplierName", source = "supplier.name")
     @Mapping(target = "supplierId", source = "supplier.id")
+    @Mapping(target = "categoryId", source = "category.id")
     InventoryItemDto toDto(InventoryItemEntity entity);
 
     @Mapping(target = "id", ignore = true)

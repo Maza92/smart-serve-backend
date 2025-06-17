@@ -44,6 +44,7 @@ public class SupplierServiceImpl implements ISupplierService {
                 if (page <= 0)
                         throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
 
+                System.out.println("sortBy: '{}', sortDirection: '{}'" + sortBy + ", " + sortDirection);
                 Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
                 Pageable pageable = PageRequest.of(Math.max(page - 1, 0), size, sort);
 

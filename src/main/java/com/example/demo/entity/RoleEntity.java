@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.example.demo.annotation.ImportColumn;
 import com.example.demo.enums.RoleEnum;
 
 import jakarta.persistence.Column;
@@ -34,5 +35,6 @@ public class RoleEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "name", nullable = false, length = 20)
+	@ImportColumn(name = "Name", required = true)
 	private RoleEnum name;
 }
