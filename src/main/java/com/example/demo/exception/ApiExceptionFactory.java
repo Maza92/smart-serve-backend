@@ -6,6 +6,7 @@ import com.example.demo.exception.exceptions.AlreadyExistsException;
 import com.example.demo.exception.exceptions.AuthException;
 import com.example.demo.exception.exceptions.BadRequestException;
 import com.example.demo.exception.exceptions.BusinessException;
+import com.example.demo.exception.exceptions.DataImportException;
 import com.example.demo.exception.exceptions.EntityException;
 import com.example.demo.exception.exceptions.EntityNotFoundException;
 import com.example.demo.exception.exceptions.ValidationException;
@@ -45,5 +46,9 @@ public class ApiExceptionFactory {
 
 	public BadRequestException badRequestException(String messageKey, Object... args) {
 		return new BadRequestException(messageKey, localeUtils.getCurrentLocale(), args);
+	}
+
+	public DataImportException dataImportException(String messageKey, Object... args) {
+		return new DataImportException(messageKey, localeUtils.getCurrentLocale(), args);
 	}
 }

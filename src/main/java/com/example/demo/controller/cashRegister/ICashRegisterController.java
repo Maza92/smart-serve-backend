@@ -1,5 +1,6 @@
 package com.example.demo.controller.cashRegister;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import com.example.demo.dto.cashRegister.CashRegisterDto;
 import com.example.demo.dto.cashRegister.ClosedCashRegisterDto;
 import com.example.demo.dto.cashRegister.OpenCashRegisterDto;
 import com.example.demo.dto.cashRegister.PartialCreateCashRegisterDto;
+import com.example.demo.dto.data.ImportResultDto;
 import com.example.demo.enums.CashRegisterEnum;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -124,4 +126,5 @@ public interface ICashRegisterController {
         })
         @GetMapping("/available")
         ResponseEntity<ApiSuccessDto<List<CashRegisterDto>>> getAvailableCashRegistersToOpen();
+
 }

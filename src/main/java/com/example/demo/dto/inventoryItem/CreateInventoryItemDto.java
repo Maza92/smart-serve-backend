@@ -37,7 +37,15 @@ public class CreateInventoryItemDto {
     @NotNull(message = "{validation.inventory.item.supplierId.notNull}")
     private Integer supplierId;
 
+    @NotNull(message = "{validation.inventory.item.categoryId.notNull}")
+    private Integer categoryId;
+
+    @NotBlank
     private String location;
+
+    @NotNull(message = "{validation.inventory.item.lastUpdated.notNull}")
     private Instant expiryDate;
+
+    @NotNull(message = "{validation.inventory.item.isActive.notNull}")
     private Boolean isActive = true;
 }
