@@ -25,6 +25,7 @@ public interface IDishMapper {
 
     DishEntity toCreateEntity(CreateDishDto dto);
 
+    @Mapping(target = "categoryId", source = "category.id")
     DishDto toDto(DishEntity entity);
 
     DishEntity updateEntityFromDto(UpdateDishDto dto, @MappingTarget DishEntity entity);

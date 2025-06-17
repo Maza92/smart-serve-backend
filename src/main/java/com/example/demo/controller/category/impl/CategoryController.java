@@ -35,6 +35,13 @@ public class CategoryController implements ICategoryController {
     }
 
     @Override
+    public ResponseEntity<ApiSuccessDto<PageDto<CategoryDto>>> getAllCategoriesByType(int page, int size, String sortBy,
+            String sortDirection, String categoryType) {
+        return ResponseEntity
+                .ok(categoryService.getAllCategoriesByType(page, size, sortBy, sortDirection, categoryType));
+    }
+
+    @Override
     public ResponseEntity<ApiSuccessDto<CategoryDto>> getCategoryById(Integer id) {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }

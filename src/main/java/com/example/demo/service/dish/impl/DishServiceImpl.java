@@ -16,12 +16,14 @@ import com.example.demo.dto.dish.CreateDishDto;
 import com.example.demo.dto.dish.DishDto;
 import com.example.demo.dto.dish.DishWithRecipesDto;
 import com.example.demo.dto.dish.UpdateDishDto;
+import com.example.demo.entity.CategoryEntity;
 import com.example.demo.entity.DishEntity;
 import com.example.demo.entity.InventoryItemEntity;
 import com.example.demo.entity.RecipeEntity;
 import com.example.demo.exception.ApiExceptionFactory;
 import com.example.demo.mappers.IDishMapper;
 import com.example.demo.mappers.IRecipeMapper;
+import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.DishRepository;
 import com.example.demo.repository.InventoryItemRepository;
 import com.example.demo.repository.RecipeRepository;
@@ -36,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class DishServiceImpl implements IDishService {
 
     private final DishRepository dishRepository;
+    private final CategoryRepository categoryRepository;
     private final RecipeRepository recipeRepository;
     private final InventoryItemRepository inventoryItemRepository;
     private final IDishMapper dishMapper;
@@ -59,7 +62,11 @@ public class DishServiceImpl implements IDishService {
             throw apiExceptionFactory.entityNotFound("operation.ingredient.not.found");
         }
 
+        CategoryEntity category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.category.not.found"));
+
         DishEntity dish = dishMapper.toCreateEntity(request);
+        dish.setCategory(category);
         dishRepository.save(dish);
 
         List<RecipeEntity> recipes = request.getIngredients().stream()
@@ -133,6 +140,12 @@ public class DishServiceImpl implements IDishService {
     public ApiSuccessDto<DishDto> updateDish(int id, UpdateDishDto request) {
         DishEntity dish = dishRepository.findById(id)
                 .orElseThrow(() -> apiExceptionFactory.entityNotFound("dish.not.found"));
+
+        if (request.getCategoryId() != dish.getCategory().getId()) {
+            CategoryEntity category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.category.not.found"));
+            dish.setCategory(category);
+        }
 
         dishMapper.updateEntityFromDto(request, dish);
         dish = dishRepository.save(dish);
