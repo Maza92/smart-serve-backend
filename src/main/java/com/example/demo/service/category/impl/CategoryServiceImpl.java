@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import com.example.demo.dto.data.ImportResultDto;
 import com.example.demo.dto.data.ParseResultDto;
 import com.example.demo.entity.CategoryEntity;
 import com.example.demo.entity.DataLogEntity;
+import com.example.demo.enums.CategoryEnum;
 import com.example.demo.enums.DataOperationStatusEnum;
 import com.example.demo.enums.DataOperationsEnum;
 import com.example.demo.exception.ApiExceptionFactory;
@@ -36,6 +38,7 @@ import com.example.demo.service.category.ICategoryService;
 import com.example.demo.service.data.BatchSaveService;
 import com.example.demo.service.data.ExcelParserService;
 import com.example.demo.service.securityContext.impl.SecurityContextService;
+import com.example.demo.specifications.CategorySpecifications;
 import com.example.demo.utils.MessageUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -68,6 +71,32 @@ public class CategoryServiceImpl implements ICategoryService {
         Pageable pageable = PageRequest.of(Math.max(page - 1, 0), size, sort);
 
         Page<CategoryEntity> categories = categoryRepository.findAll(pageable);
+        PageDto<CategoryDto> categoriesDto = categoryMapper.toPageDto(categories);
+        return ApiSuccessDto.of(HttpStatus.OK.value(), messageUtils.getMessage("operation.category.get.all.success"),
+                categoriesDto);
+    }
+
+    @Override
+    public ApiSuccessDto<PageDto<CategoryDto>> getAllCategoriesByType(int page, int size, String sortBy,
+            String sortDirection, String categoryType) {
+
+        if (size <= 0)
+            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
+
+        if (page <= 0)
+            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), size, sort);
+
+        Specification<CategoryEntity> spec = Specification.where(null);
+
+        if (categoryType == null || categoryType.isEmpty())
+            throw apiExceptionFactory.badRequestException("operation.category.get.all.invalid.category.type");
+
+        spec = spec.and(CategorySpecifications.categoryTypeEquals(categoryType));
+
+        Page<CategoryEntity> categories = categoryRepository.findAll(spec, pageable);
         PageDto<CategoryDto> categoriesDto = categoryMapper.toPageDto(categories);
         return ApiSuccessDto.of(HttpStatus.OK.value(), messageUtils.getMessage("operation.category.get.all.success"),
                 categoriesDto);

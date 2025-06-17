@@ -36,7 +36,7 @@ public class UpdateDishDto {
 
     @NotBlank(message = "{validation.dish.category.notBlank}")
     @Size(max = 50, message = "{validation.dish.category.size}")
-    String category;
+    Integer categoryId;
 
     @Size(max = 255, message = "{validation.dish.imageUrl.size}")
     String imageUrl;

@@ -13,6 +13,9 @@ import com.example.demo.dto.data.ImportResultDto;
 public interface ICategoryService {
     ApiSuccessDto<PageDto<CategoryDto>> getAllCategories(int page, int size, String sortBy, String sortDirection);
 
+    ApiSuccessDto<PageDto<CategoryDto>> getAllCategoriesByType(int page, int size, String sortBy, String sortDirection,
+            String categoryType);
+
     ApiSuccessDto<CategoryDto> getCategoryById(int id);
 
     ApiSuccessDto<CategoryDto> createCategory(CreateCategoryDto category);

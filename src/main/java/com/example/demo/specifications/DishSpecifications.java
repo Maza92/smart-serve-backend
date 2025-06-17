@@ -2,7 +2,10 @@ package com.example.demo.specifications;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.example.demo.entity.CategoryEntity;
 import com.example.demo.entity.DishEntity;
+
+import jakarta.persistence.criteria.Join;
 
 public class DishSpecifications {
 
@@ -15,7 +18,10 @@ public class DishSpecifications {
     }
 
     public static Specification<DishEntity> categoryEquals(String category) {
-        return (root, query, cb) -> cb.equal(cb.lower(root.get("category")), category.toLowerCase());
+        return (root, query, cb) -> {
+            Join<DishEntity, CategoryEntity> join = root.join("category");
+            return cb.equal(cb.lower(join.get("name")), category.toLowerCase());
+        };
     }
 
     public static Specification<DishEntity> isActiveEquals(String status) {
