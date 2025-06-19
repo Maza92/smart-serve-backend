@@ -6,6 +6,7 @@ import com.example.demo.dto.api.ApiSuccessDto;
 import com.example.demo.dto.api.PageDto;
 import com.example.demo.dto.dish.CreateDishDto;
 import com.example.demo.dto.dish.DishDto;
+import com.example.demo.dto.dish.DishWithIngredientsDto;
 import com.example.demo.dto.dish.DishWithRecipesDto;
 import com.example.demo.dto.dish.UpdateDishDto;
 import com.example.demo.entity.DishEntity;
@@ -25,6 +26,8 @@ public interface IDishService {
                         String sortDirection);
 
         ApiSuccessDto<DishDto> getDishById(int id);
+
+        ApiSuccessDto<DishWithIngredientsDto> getDishByIdWithIngredients(int id);
 
         ApiSuccessDto<DishDto> updateDish(int id, UpdateDishDto request);
 

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import com.example.demo.dto.api.PageDto;
 import com.example.demo.dto.dish.CreateDishDto;
 import com.example.demo.dto.dish.DishDto;
+import com.example.demo.dto.dish.DishWithIngredientsDto;
 import com.example.demo.dto.dish.DishWithRecipesDto;
 import com.example.demo.dto.dish.UpdateDishDto;
 import com.example.demo.entity.DishEntity;
@@ -34,6 +35,9 @@ public interface IDishMapper {
     DishWithRecipesDto toDtoWithRecipesSummary(DishEntity entity);
 
     List<DishWithRecipesDto> toDto(List<DishEntity> dishes);
+
+    @Mapping(target = "categoryId", source = "category.id")
+    DishWithIngredientsDto toDtoWithIngredients(DishEntity entity);
 
     default PageDto<DishWithRecipesDto> toPageDto(Page<DishEntity> dishPage) {
         List<DishWithRecipesDto> content = toDto(dishPage.getContent());
