@@ -39,4 +39,29 @@ public class InventoryMovementController implements IInventoryMovementController
         return ResponseEntity.ok(inventoryMovementService.getMovementsByOrder(id, page, size));
     }
 
+    @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<ApiSuccessDto<PageDto<InventoryMovementDto>>> getMovementsByUser(
+            Integer id,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok(inventoryMovementService.getMovementsByUser(id, page, size));
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<ApiSuccessDto<PageDto<InventoryMovementDto>>> getMovementsBySupplier(
+            Integer id,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok(inventoryMovementService.getMovementsBySupplier(id, page, size));
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<ApiSuccessDto<PageDto<InventoryMovementDto>>> getLastMovements(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok(inventoryMovementService.getLastMovements(page, size));
+    }
 }

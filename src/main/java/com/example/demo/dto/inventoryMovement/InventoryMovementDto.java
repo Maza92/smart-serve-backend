@@ -23,6 +23,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class InventoryMovementDto {
     private Integer itemId;
+    private String itemName;
     private Integer userId;
     private MovementTypeEnum movementType;
     private BigDecimal quantityBefore;

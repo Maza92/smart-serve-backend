@@ -85,6 +85,7 @@ public class InventoryMovementEntity extends BaseAuditEntity {
 
     @PrePersist
     public void prePersist() {
+        super.prePersist();
         if (movementDate == null) {
             movementDate = Instant.now();
         }
