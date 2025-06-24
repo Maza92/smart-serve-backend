@@ -1,6 +1,7 @@
 package com.example.demo.mappers;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
@@ -13,6 +14,12 @@ import com.example.demo.entity.InventoryMovementEntity;
 public interface IInventoryMovementMapper {
     IInventoryMovementMapper INSTANCE = Mappers.getMapper(IInventoryMovementMapper.class);
 
+    @Mapping(target = "itemId", source = "inventoryItem.id")
+    @Mapping(target = "itemImagePath", source = "inventoryItem.imagePath")
+    @Mapping(target = "itemName", source = "inventoryItem.name")
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "userName", ignore = true)
+    @Mapping(target = "movementValue", ignore = true)
     InventoryMovementDto toDto(InventoryMovementEntity entity);
 
 }

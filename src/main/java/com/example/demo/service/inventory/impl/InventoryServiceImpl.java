@@ -43,10 +43,15 @@ public class InventoryServiceImpl implements IInventoryService {
     @Transactional
     public ApiSuccessDto<Void> updateStock(UpdateInventoryItemStockDto request) {
         InventoryItemEntity item = itemRepository.findById(request.getItemId())
-                .orElseThrow(() -> apiExceptionFactory.entityNotFound(""));
+                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.inventory.update.not.found"));
 
         BigDecimal quantityBefore = item.getStockQuantity();
-        BigDecimal quantityAfter = quantityBefore.add(request.getQuantityChanged());
+        BigDecimal quantityAfter = switch (request.getMovementType()) {
+            case IN, ADJUSTMENT_IN, TRANSFER_IN -> quantityBefore.add(request.getQuantityChanged());
+            case OUT, ADJUSTMENT_OUT, TRANSFER_OUT -> quantityBefore.subtract(request.getQuantityChanged());
+            default ->
+                throw apiExceptionFactory.badRequestException("operation.inventory.update.invalid.movement.type");
+        };
 
         InventoryMovementEntity movement = InventoryMovementEntity.builder()
                 .inventoryItem(item)
@@ -90,7 +95,12 @@ public class InventoryServiceImpl implements IInventoryService {
             InventoryItemEntity item = itemMap.get(request.getItemId());
 
             BigDecimal quantityBefore = item.getStockQuantity();
-            BigDecimal quantityAfter = quantityBefore.add(request.getQuantityChanged());
+            BigDecimal quantityAfter = switch (request.getMovementType()) {
+                case IN, ADJUSTMENT_IN, TRANSFER_IN -> quantityBefore.add(request.getQuantityChanged());
+                case OUT, ADJUSTMENT_OUT, TRANSFER_OUT -> quantityBefore.subtract(request.getQuantityChanged());
+                default ->
+                    throw apiExceptionFactory.badRequestException("operation.inventory.update.invalid.movement.type");
+            };
 
             InventoryMovementEntity movement = InventoryMovementEntity.builder()
                     .inventoryItem(item)

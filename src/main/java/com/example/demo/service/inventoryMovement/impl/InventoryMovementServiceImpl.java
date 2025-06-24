@@ -1,5 +1,6 @@
 package com.example.demo.service.inventoryMovement.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -31,103 +32,64 @@ public class InventoryMovementServiceImpl implements IInventoryMovementService {
 
     @Override
     public ApiSuccessDto<PageDto<InventoryMovementDto>> getMovementsByItem(Integer id, Integer page, Integer size) {
-
-        if (size <= 0)
-            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
-
-        if (page <= 0)
-            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
-
-        Pageable pageable = Pageable.ofSize(size).withPage(Math.max(page - 1, 0));
-
+        Pageable pageable = getPageable(page, size);
         Page<InventoryMovementEntity> inventoryMovements = inventoryMovementRepository.findAllByItemId(id, pageable);
-
-        List<InventoryMovementDto> inventoryMovementsDto = inventoryMovements.getContent().stream()
-                .map(inventoryMovementMapper::toDto)
-                .toList();
-        return ApiSuccessDto.of(HttpStatus.OK.value(),
-                messageUtils.getMessage("operation.inventory.item.get.all.success"),
-                PageDto.fromPage(inventoryMovements, inventoryMovementsDto));
+        return processMovementsForPagedDtos(inventoryMovements, "operation.inventory.item.get.all.success");
     }
 
     @Override
     public ApiSuccessDto<PageDto<InventoryMovementDto>> getMovementsByOrder(Integer id, Integer page, Integer size) {
-        if (size <= 0)
-            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
-
-        if (page <= 0)
-            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
-
-        Pageable pageable = Pageable.ofSize(size).withPage(Math.max(page - 1, 0));
-
+        Pageable pageable = getPageable(page, size);
         Page<InventoryMovementEntity> inventoryMovements = inventoryMovementRepository.findAllByOrderId(id,
                 ReferenceTypeEnum.ORDER, pageable);
-
-        List<InventoryMovementDto> inventoryMovementsDto = inventoryMovements.getContent().stream()
-                .map(inventoryMovementMapper::toDto)
-                .toList();
-        return ApiSuccessDto.of(HttpStatus.OK.value(),
-                messageUtils.getMessage("operation.inventory.order.get.all.success"),
-                PageDto.fromPage(inventoryMovements, inventoryMovementsDto));
+        return processMovementsForPagedDtos(inventoryMovements, "operation.inventory.order.get.all.success");
     }
 
     public ApiSuccessDto<PageDto<InventoryMovementDto>> getMovementsByUser(Integer id, Integer page, Integer size) {
-        if (size <= 0)
-            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
-
-        if (page <= 0)
-            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
-
-        Pageable pageable = Pageable.ofSize(size).withPage(Math.max(page - 1, 0));
-
+        Pageable pageable = getPageable(page, size);
         Page<InventoryMovementEntity> inventoryMovements = inventoryMovementRepository.findAllByUserId(id, pageable);
-
-        List<InventoryMovementDto> inventoryMovementsDto = inventoryMovements.getContent().stream()
-                .map(inventoryMovementMapper::toDto)
-                .toList();
-        return ApiSuccessDto.of(HttpStatus.OK.value(),
-                messageUtils.getMessage("operation.inventory.user.get.all.success"),
-                PageDto.fromPage(inventoryMovements, inventoryMovementsDto));
+        return processMovementsForPagedDtos(inventoryMovements, "operation.inventory.user.get.all.success");
     }
 
     @Override
     public ApiSuccessDto<PageDto<InventoryMovementDto>> getMovementsBySupplier(Integer id, Integer page, Integer size) {
-        if (size <= 0)
-            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
-
-        if (page <= 0)
-            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
-
-        Pageable pageable = Pageable.ofSize(size).withPage(Math.max(page - 1, 0));
-
+        Pageable pageable = getPageable(page, size);
         Page<InventoryMovementEntity> inventoryMovements = inventoryMovementRepository.findAllBySupplierId(id,
                 pageable);
-
-        List<InventoryMovementDto> inventoryMovementsDto = inventoryMovements.getContent().stream()
-                .map(inventoryMovementMapper::toDto)
-                .toList();
-        return ApiSuccessDto.of(HttpStatus.OK.value(),
-                messageUtils.getMessage("operation.inventory.supplier.get.all.success"),
-                PageDto.fromPage(inventoryMovements, inventoryMovementsDto));
+        return processMovementsForPagedDtos(inventoryMovements, "operation.inventory.supplier.get.all.success");
     }
 
     public ApiSuccessDto<PageDto<InventoryMovementDto>> getLastMovements(Integer page, Integer size) {
+        Pageable pageable = getPageable(page, size);
+        Page<InventoryMovementEntity> inventoryMovements = inventoryMovementRepository.findAllLastMovements(pageable);
+        return processMovementsForPagedDtos(inventoryMovements, "operation.inventory.last.get.all.success");
+    }
+
+    private ApiSuccessDto<PageDto<InventoryMovementDto>> processMovementsForPagedDtos(
+            Page<InventoryMovementEntity> inventoryMovements, String message) {
+        List<InventoryMovementDto> inventoryMovementsDto = inventoryMovements.getContent().stream()
+                .map(movement -> {
+                    InventoryMovementDto dto = inventoryMovementMapper.toDto(movement);
+                    dto.setUserName(movement.getUser().getFirstName() + " " + movement.getUser().getLastName());
+                    dto.setMovementValue(movement.getQuantityChanged().multiply(movement.getUnitCostAtTime()));
+
+                    return dto;
+                })
+                .toList();
+
+        return ApiSuccessDto.of(HttpStatus.OK.value(),
+                messageUtils.getMessage(message),
+                PageDto.fromPage(inventoryMovements, inventoryMovementsDto));
+    }
+
+    private Pageable getPageable(Integer page, Integer size) {
         if (size <= 0)
             throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
 
         if (page <= 0)
             throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
 
-        Pageable pageable = Pageable.ofSize(size).withPage(Math.max(page - 1, 0));
-
-        Page<InventoryMovementEntity> inventoryMovements = inventoryMovementRepository.findAllLastMovements(pageable);
-
-        List<InventoryMovementDto> inventoryMovementsDto = inventoryMovements.getContent().stream()
-                .map(inventoryMovementMapper::toDto)
-                .toList();
-        return ApiSuccessDto.of(HttpStatus.OK.value(),
-                messageUtils.getMessage("operation.inventory.last.get.all.success"),
-                PageDto.fromPage(inventoryMovements, inventoryMovementsDto));
+        return Pageable.ofSize(size).withPage(Math.max(page - 1, 0));
     }
 
 }

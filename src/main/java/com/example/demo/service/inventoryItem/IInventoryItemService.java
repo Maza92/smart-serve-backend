@@ -10,6 +10,8 @@ public interface IInventoryItemService {
     ApiSuccessDto<PageDto<InventoryItemDto>> getAllInventoryItems(int page, int size, String search,
             String location, String status, String sortBy, String sortDirection);
 
+    ApiSuccessDto<PageDto<InventoryItemDto>> getAllInventoryItemsBySupplier(int supplierId, int page, int size);
+
     ApiSuccessDto<InventoryItemDto> getInventoryItemById(int id);
 
     ApiSuccessDto<InventoryItemDto> createInventoryItem(CreateInventoryItemDto createDto);

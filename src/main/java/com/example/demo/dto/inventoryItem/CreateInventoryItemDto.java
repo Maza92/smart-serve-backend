@@ -23,6 +23,9 @@ public class CreateInventoryItemDto {
     @NotBlank(message = "{validation.inventory.item.name.notBlank}")
     private String name;
 
+    @NotBlank(message = "{validation.inventory.item.imagePath.notBlank}")
+    private String imagePath;
+
     @NotBlank(message = "{validation.inventory.item.unit.notBlank}")
     private String unit;
 
