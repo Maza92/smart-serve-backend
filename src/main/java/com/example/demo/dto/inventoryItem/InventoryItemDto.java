@@ -19,6 +19,7 @@ import lombok.experimental.Accessors;
 public class InventoryItemDto {
     private Integer id;
     private String name;
+    private String imagePath;
     private String unit;
     private BigDecimal stockQuantity;
     private BigDecimal unitCost;

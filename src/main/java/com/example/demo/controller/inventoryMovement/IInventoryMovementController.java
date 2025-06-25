@@ -58,4 +58,56 @@ public interface IInventoryMovementController {
                         @RequestParam(defaultValue = "1") Integer page,
                         @RequestParam(defaultValue = "10") Integer size);
 
+        @GetMapping("/by-user/{id}")
+        @AcceptLanguageHeader
+        @Operation(summary = "Get movements by user", description = "Gets a paginated list of inventory movements for a specific user")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Movements retrieved successfully", content = {
+                                        @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)) }),
+                        @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Unexpected error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class)))
+        })
+        @SecurityRequirement(name = "Auth")
+        ResponseEntity<ApiSuccessDto<PageDto<InventoryMovementDto>>> getMovementsByUser(
+                        @PathVariable(required = true) Integer id,
+                        @RequestParam(defaultValue = "1") Integer page,
+                        @RequestParam(defaultValue = "10") Integer size);
+
+        @GetMapping("/by-supplier/{id}")
+        @AcceptLanguageHeader
+        @Operation(summary = "Get movements by supplier", description = "Gets a paginated list of inventory movements for a specific supplier")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Movements retrieved successfully", content = {
+                                        @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)) }),
+                        @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Supplier not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Unexpected error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class)))
+        })
+        @SecurityRequirement(name = "Auth")
+        ResponseEntity<ApiSuccessDto<PageDto<InventoryMovementDto>>> getMovementsBySupplier(
+                        @PathVariable(required = true) Integer id,
+                        @RequestParam(defaultValue = "1") Integer page,
+                        @RequestParam(defaultValue = "10") Integer size);
+
+        @GetMapping("/last")
+        @AcceptLanguageHeader
+        @Operation(summary = "Get last movements", description = "Gets a paginated list of last inventory movements")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Movements retrieved successfully", content = {
+                                        @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)) }),
+                        @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Unexpected error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class)))
+        })
+        @SecurityRequirement(name = "Auth")
+        ResponseEntity<ApiSuccessDto<PageDto<InventoryMovementDto>>> getLastMovements(
+                        @RequestParam(defaultValue = "1") Integer page,
+                        @RequestParam(defaultValue = "10") Integer size);
 }

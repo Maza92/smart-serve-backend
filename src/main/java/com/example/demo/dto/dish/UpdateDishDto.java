@@ -34,8 +34,7 @@ public class UpdateDishDto {
     @Positive(message = "{validation.dish.basePrice.positive}")
     Double basePrice;
 
-    @NotBlank(message = "{validation.dish.category.notBlank}")
-    @Size(max = 50, message = "{validation.dish.category.size}")
+    @NotNull(message = "{validation.dish.categoryId.notNull}")
     Integer categoryId;
 
     @Size(max = 255, message = "{validation.dish.imageUrl.size}")
@@ -48,7 +47,4 @@ public class UpdateDishDto {
     Boolean isActive;
 
     Boolean isFeatured;
-
-    @Valid
-    List<CreateRecipeToDishDto> ingredients;
 }

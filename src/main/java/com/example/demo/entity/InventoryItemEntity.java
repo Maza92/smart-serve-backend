@@ -41,6 +41,9 @@ public class InventoryItemEntity extends BaseAuditEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Column(name = "image_path", length = Integer.MAX_VALUE, nullable = false)
+    private String imagePath;
+
     @Column(name = "unit", nullable = false, length = 20)
     private String unit;
 

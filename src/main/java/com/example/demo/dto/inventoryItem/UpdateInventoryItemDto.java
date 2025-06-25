@@ -19,6 +19,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class UpdateInventoryItemDto {
     private String name;
+    private String imagePath;
     private String unit;
 
     @Positive(message = "{validation.inventory.item.unitCost.positive}")

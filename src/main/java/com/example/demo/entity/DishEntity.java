@@ -67,7 +67,7 @@ public class DishEntity extends BaseAuditEntity {
     private Set<RecipeEntity> recipes;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id", nullable = true)
+    @JoinColumn(name = "category", nullable = true)
     private CategoryEntity category;
 
     @ToString.Exclude

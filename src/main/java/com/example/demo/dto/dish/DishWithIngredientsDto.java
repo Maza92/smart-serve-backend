@@ -3,7 +3,7 @@ package com.example.demo.dto.dish;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.example.demo.dto.recipe.CreateRecipeToDishDto;
+import com.example.demo.dto.recipe.IngredientsSummaryDto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -22,7 +22,11 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @ToString
 @Accessors(chain = true)
-public class CreateDishDto {
+public class DishWithIngredientsDto {
+
+    @NotNull(message = "{validation.dish.id.notNull}")
+    Integer id;
+
     @NotBlank(message = "{validation.dish.name.notBlank}")
     @Size(min = 2, max = 100, message = "{validation.dish.name.size}")
     String name;
@@ -47,5 +51,5 @@ public class CreateDishDto {
 
     @NotEmpty(message = "{validation.dish.ingredients.notEmpty}")
     @Valid
-    List<CreateRecipeToDishDto> ingredients;
+    List<IngredientsSummaryDto> ingredients;
 }

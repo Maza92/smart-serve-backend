@@ -34,115 +34,135 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InventoryItemServiceImpl implements IInventoryItemService {
 
-    private final InventoryItemRepository inventoryItemRepository;
-    private final SupplierRepository supplierRepository;
-    private final CategoryRepository categoryRepository;
-    private final IInventoryItemMapper inventoryItemMapper;
-    private final MessageUtils messageUtils;
-    private final ApiExceptionFactory apiExceptionFactory;
+        private final InventoryItemRepository inventoryItemRepository;
+        private final SupplierRepository supplierRepository;
+        private final CategoryRepository categoryRepository;
+        private final IInventoryItemMapper inventoryItemMapper;
+        private final MessageUtils messageUtils;
+        private final ApiExceptionFactory apiExceptionFactory;
 
-    @Override
-    public ApiSuccessDto<PageDto<InventoryItemDto>> getAllInventoryItems(int page, int size, String search,
-            String location, String status, String sortBy, String sortDirection) {
+        @Override
+        public ApiSuccessDto<PageDto<InventoryItemDto>> getAllInventoryItems(int page, int size, String search,
+                        String location, String status, String sortBy, String sortDirection) {
 
-        if (size <= 0)
-            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
+                if (size <= 0)
+                        throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
 
-        if (page <= 0)
-            throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
+                if (page <= 0)
+                        throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
-        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), size, sort);
+                Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+                Pageable pageable = PageRequest.of(Math.max(page - 1, 0), size, sort);
 
-        Specification<InventoryItemEntity> spec = Specification.where(null);
+                Specification<InventoryItemEntity> spec = Specification.where(null);
 
-        if (search != null && !search.isBlank()) {
-            spec = spec.and(InventoryItemSpecifications.nameContains(search));
+                if (search != null && !search.isBlank()) {
+                        spec = spec.and(InventoryItemSpecifications.nameContains(search));
+                }
+
+                if (location != null && !location.isBlank()) {
+                        spec = spec.and(InventoryItemSpecifications.locationEquals(location));
+                }
+
+                if (status != null && !status.isBlank()) {
+                        spec = spec.and(InventoryItemSpecifications.isActiveEquals(status));
+                }
+
+                Page<InventoryItemEntity> inventoryItems = inventoryItemRepository.findAll(spec, pageable);
+
+                List<InventoryItemDto> inventoryItemsDto = inventoryItems.getContent().stream()
+                                .map(inventoryItemMapper::toDto)
+                                .toList();
+
+                return ApiSuccessDto.of(HttpStatus.OK.value(),
+                                messageUtils.getMessage("operation.inventory.item.get.all.success"),
+                                PageDto.fromPage(inventoryItems, inventoryItemsDto));
         }
 
-        if (location != null && !location.isBlank()) {
-            spec = spec.and(InventoryItemSpecifications.locationEquals(location));
+        @Override
+        public ApiSuccessDto<PageDto<InventoryItemDto>> getAllInventoryItemsBySupplier(int supplierId, int page,
+                        int size) {
+                Page<InventoryItemEntity> inventoryItems = inventoryItemRepository.findAllBySupplierId(supplierId,
+                                PageRequest.of(page - 1, size));
+
+                List<InventoryItemDto> inventoryItemsDto = inventoryItems.getContent().stream()
+                                .map(inventoryItemMapper::toDto)
+                                .toList();
+
+                return ApiSuccessDto.of(HttpStatus.OK.value(),
+                                messageUtils.getMessage("operation.inventory.item.get.all.success"),
+                                PageDto.fromPage(inventoryItems, inventoryItemsDto));
         }
 
-        if (status != null && !status.isBlank()) {
-            spec = spec.and(InventoryItemSpecifications.isActiveEquals(status));
+        @Override
+        public ApiSuccessDto<InventoryItemDto> getInventoryItemById(int id) {
+                InventoryItemEntity inventoryItem = inventoryItemRepository.findById(id)
+                                .orElseThrow(() -> apiExceptionFactory
+                                                .entityNotFound("operation.inventory.item.get.by.id.not.found"));
+
+                return ApiSuccessDto.of(HttpStatus.OK.value(),
+                                messageUtils.getMessage("operation.inventory.item.get.by.id.success"),
+                                inventoryItemMapper.toDto(inventoryItem));
         }
 
-        Page<InventoryItemEntity> inventoryItems = inventoryItemRepository.findAll(spec, pageable);
+        @Override
+        public ApiSuccessDto<InventoryItemDto> createInventoryItem(CreateInventoryItemDto createDto) {
+                SupplierEntity supplier = supplierRepository.findById(createDto.getSupplierId())
+                                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.supplier.not.found"));
 
-        List<InventoryItemDto> inventoryItemsDto = inventoryItems.getContent().stream()
-                .map(inventoryItemMapper::toDto)
-                .toList();
+                CategoryEntity category = categoryRepository.findById(createDto.getCategoryId())
+                                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.category.not.found"));
 
-        return ApiSuccessDto.of(HttpStatus.OK.value(),
-                messageUtils.getMessage("operation.inventory.item.get.all.success"),
-                PageDto.fromPage(inventoryItems, inventoryItemsDto));
-    }
+                InventoryItemEntity inventoryItem = inventoryItemMapper.toEntity(createDto);
+                inventoryItem.setSupplier(supplier);
+                inventoryItem.setCategory(category);
+                inventoryItem.setStockQuantity(BigDecimal.ZERO);
 
-    @Override
-    public ApiSuccessDto<InventoryItemDto> getInventoryItemById(int id) {
-        InventoryItemEntity inventoryItem = inventoryItemRepository.findById(id)
-                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.inventory.item.get.by.id.not.found"));
+                InventoryItemEntity savedInventoryItem = inventoryItemRepository.save(inventoryItem);
 
-        return ApiSuccessDto.of(HttpStatus.OK.value(),
-                messageUtils.getMessage("operation.inventory.item.get.by.id.success"),
-                inventoryItemMapper.toDto(inventoryItem));
-    }
-
-    @Override
-    public ApiSuccessDto<InventoryItemDto> createInventoryItem(CreateInventoryItemDto createDto) {
-        SupplierEntity supplier = supplierRepository.findById(createDto.getSupplierId())
-                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.supplier.not.found"));
-
-        CategoryEntity category = categoryRepository.findById(createDto.getCategoryId())
-                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.category.not.found"));
-
-        InventoryItemEntity inventoryItem = inventoryItemMapper.toEntity(createDto);
-        inventoryItem.setSupplier(supplier);
-        inventoryItem.setCategory(category);
-        inventoryItem.setStockQuantity(BigDecimal.ZERO);
-
-        InventoryItemEntity savedInventoryItem = inventoryItemRepository.save(inventoryItem);
-
-        return ApiSuccessDto.of(HttpStatus.CREATED.value(),
-                messageUtils.getMessage("operation.inventory.item.create.success"),
-                inventoryItemMapper.toDto(savedInventoryItem));
-    }
-
-    @Override
-    public ApiSuccessDto<InventoryItemDto> updateInventoryItem(int id, UpdateInventoryItemDto updateDto) {
-        InventoryItemEntity inventoryItem = inventoryItemRepository.findById(id)
-                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.inventory.item.update.not.found"));
-
-        inventoryItemMapper.updateEntityFromDto(updateDto, inventoryItem);
-
-        if (updateDto.getSupplierId() != inventoryItem.getSupplier().getId()) {
-            SupplierEntity supplier = supplierRepository.findById(updateDto.getSupplierId())
-                    .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.supplier.not.found"));
-            inventoryItem.setSupplier(supplier);
+                return ApiSuccessDto.of(HttpStatus.CREATED.value(),
+                                messageUtils.getMessage("operation.inventory.item.create.success"),
+                                inventoryItemMapper.toDto(savedInventoryItem));
         }
 
-        if (updateDto.getCategoryId() != inventoryItem.getCategory().getId()) {
-            CategoryEntity category = categoryRepository.findById(updateDto.getCategoryId())
-                    .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.category.not.found"));
-            inventoryItem.setCategory(category);
+        @Override
+        public ApiSuccessDto<InventoryItemDto> updateInventoryItem(int id, UpdateInventoryItemDto updateDto) {
+                InventoryItemEntity inventoryItem = inventoryItemRepository.findById(id)
+                                .orElseThrow(() -> apiExceptionFactory
+                                                .entityNotFound("operation.inventory.item.update.not.found"));
+
+                inventoryItemMapper.updateEntityFromDto(updateDto, inventoryItem);
+
+                if (updateDto.getSupplierId() != inventoryItem.getSupplier().getId()) {
+                        SupplierEntity supplier = supplierRepository.findById(updateDto.getSupplierId())
+                                        .orElseThrow(() -> apiExceptionFactory
+                                                        .entityNotFound("operation.supplier.not.found"));
+                        inventoryItem.setSupplier(supplier);
+                }
+
+                if (updateDto.getCategoryId() != inventoryItem.getCategory().getId()) {
+                        CategoryEntity category = categoryRepository.findById(updateDto.getCategoryId())
+                                        .orElseThrow(() -> apiExceptionFactory
+                                                        .entityNotFound("operation.category.not.found"));
+                        inventoryItem.setCategory(category);
+                }
+
+                InventoryItemEntity savedInventoryItem = inventoryItemRepository.save(inventoryItem);
+
+                return ApiSuccessDto.of(HttpStatus.OK.value(),
+                                messageUtils.getMessage("operation.inventory.item.update.success"),
+                                inventoryItemMapper.toDto(savedInventoryItem));
         }
 
-        InventoryItemEntity savedInventoryItem = inventoryItemRepository.save(inventoryItem);
+        @Override
+        public ApiSuccessDto<Void> deleteInventoryItem(int id) {
+                InventoryItemEntity inventoryItem = inventoryItemRepository.findById(id)
+                                .orElseThrow(() -> apiExceptionFactory
+                                                .entityNotFound("operation.inventory.item.delete.not.found"));
 
-        return ApiSuccessDto.of(HttpStatus.OK.value(),
-                messageUtils.getMessage("operation.inventory.item.update.success"),
-                inventoryItemMapper.toDto(savedInventoryItem));
-    }
+                inventoryItemRepository.delete(inventoryItem);
 
-    @Override
-    public ApiSuccessDto<Void> deleteInventoryItem(int id) {
-        InventoryItemEntity inventoryItem = inventoryItemRepository.findById(id)
-                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.inventory.item.delete.not.found"));
-
-        inventoryItemRepository.delete(inventoryItem);
-
-        return ApiSuccessDto.of(HttpStatus.OK.value(),
-                messageUtils.getMessage("operation.inventory.item.delete.success"), null);
-    }
+                return ApiSuccessDto.of(HttpStatus.OK.value(),
+                                messageUtils.getMessage("operation.inventory.item.delete.success"), null);
+        }
 }
