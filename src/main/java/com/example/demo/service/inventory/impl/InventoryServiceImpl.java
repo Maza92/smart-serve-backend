@@ -84,7 +84,7 @@ public class InventoryServiceImpl implements IInventoryService {
         Map<Integer, InventoryItemEntity> itemMap = itemsFromDb.stream()
                 .collect(Collectors.toMap(InventoryItemEntity::getId, item -> item));
         if (itemMap.size() != itemIds.size()) {
-            throw apiExceptionFactory.entityNotFound("opertaion.inventory.update.batch.not.found");
+            throw apiExceptionFactory.entityNotFound("operation.inventory.update.batch.not.found");
         }
 
         List<InventoryItemEntity> itemsToUpdate = new ArrayList<>(items.size());
