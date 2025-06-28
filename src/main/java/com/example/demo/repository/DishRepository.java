@@ -23,4 +23,8 @@ public interface DishRepository extends JpaRepository<DishEntity, Integer>, JpaS
     @EntityGraph(attributePaths = { "recipes", "recipes.inventoryItem" })
     @Query("SELECT d FROM DishEntity d WHERE d.id = :id")
     Optional<DishEntity> getDishWithRecipesById(@Param("id") int id);
+
+    @EntityGraph(attributePaths = { "recipes", "recipes.inventoryItem" })
+    @Query("SELECT d FROM DishEntity d WHERE d.id = :id")
+    Optional<DishEntity> findByIdWithRecipesAndItems(@Param("id") int id);
 }

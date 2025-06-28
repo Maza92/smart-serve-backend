@@ -1,6 +1,9 @@
 package com.example.demo.service.dish.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +20,7 @@ import com.example.demo.dto.dish.DishDto;
 import com.example.demo.dto.dish.DishWithIngredientsDto;
 import com.example.demo.dto.dish.DishWithRecipesDto;
 import com.example.demo.dto.dish.UpdateDishDto;
+import com.example.demo.dto.orderDetail.CreateOrderDetailDto;
 import com.example.demo.entity.CategoryEntity;
 import com.example.demo.entity.DishEntity;
 import com.example.demo.entity.InventoryItemEntity;
@@ -186,6 +190,25 @@ public class DishServiceImpl implements IDishService {
 
                 return ApiSuccessDto.of(HttpStatus.OK.value(),
                                 messageUtils.getMessage("operation.dish.delete.success"), null);
+        }
+
+        @Override
+        public Map<Integer, DishEntity> validateDishesForOrder(List<CreateOrderDetailDto> details) {
+                List<Integer> dishIds = details.stream().map(CreateOrderDetailDto::getDishId).toList();
+                List<DishEntity> foundDishes = dishRepository.findAllById(dishIds);
+
+                if (foundDishes.size() != dishIds.size()) {
+                        throw apiExceptionFactory.badRequestException("operation.dishes.not.found");
+                }
+
+                for (DishEntity dish : foundDishes) {
+                        if (!dish.getIsActive()) {
+                                throw apiExceptionFactory.badRequestException("operation.dish.not.active",
+                                                dish.getName());
+                        }
+                }
+
+                return foundDishes.stream().collect(Collectors.toMap(DishEntity::getId, Function.identity()));
         }
 
         private Specification<DishEntity> buildSpecification(String search, String category,

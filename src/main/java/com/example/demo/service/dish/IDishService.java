@@ -1,6 +1,7 @@
 package com.example.demo.service.dish;
 
 import java.util.List;
+import java.util.Map;
 
 import com.example.demo.dto.api.ApiSuccessDto;
 import com.example.demo.dto.api.PageDto;
@@ -9,6 +10,7 @@ import com.example.demo.dto.dish.DishDto;
 import com.example.demo.dto.dish.DishWithIngredientsDto;
 import com.example.demo.dto.dish.DishWithRecipesDto;
 import com.example.demo.dto.dish.UpdateDishDto;
+import com.example.demo.dto.orderDetail.CreateOrderDetailDto;
 import com.example.demo.entity.DishEntity;
 
 public interface IDishService {
@@ -32,4 +34,6 @@ public interface IDishService {
         ApiSuccessDto<DishDto> updateDish(int id, UpdateDishDto request);
 
         ApiSuccessDto<Void> deleteDish(int id);
+
+        Map<Integer, DishEntity> validateDishesForOrder(List<CreateOrderDetailDto> details);
 }

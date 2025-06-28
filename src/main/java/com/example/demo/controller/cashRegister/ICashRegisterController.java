@@ -91,7 +91,9 @@ public interface ICashRegisterController {
         @Parameter(name = "size", description = "Page size", example = "10")
         ResponseEntity<ApiSuccessDto<PageDto<CashRegisterDto>>> getAllCashRegisters(
                         @RequestParam(defaultValue = "1") int page,
-                        @RequestParam(defaultValue = "10") int size);
+                        @RequestParam(defaultValue = "10") int size,
+                        @RequestParam(required = false, defaultValue = "asc") String sortDirection,
+                        @RequestParam(required = false, defaultValue = "id") String sortBy);
 
         @AcceptLanguageHeader
         @SecurityRequirement(name = "Auth")

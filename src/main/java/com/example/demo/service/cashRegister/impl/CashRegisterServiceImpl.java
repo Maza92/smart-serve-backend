@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -196,14 +198,16 @@ public class CashRegisterServiceImpl implements ICashRegisterService {
      * @throws BadRequestException if the page or size parameters are invalid
      */
     @Override
-    public ApiSuccessDto<PageDto<CashRegisterDto>> getAllCashRegisters(int page, int size) {
+    public ApiSuccessDto<PageDto<CashRegisterDto>> getAllCashRegisters(int page, int size, String sortDirection,
+            String sortBy) {
         if (size <= 0)
             throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.size");
 
         if (page <= 0)
             throw apiExceptionFactory.badRequestException("operation.get.all.invalid.page.number");
 
-        Pageable pageable = Pageable.ofSize(size).withPage(Math.max(page - 1, 0));
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), size, sort);
         Page<CashRegisterEntity> cashRegisters = cashRegisterRepository.findAll(pageable);
 
         List<CashRegisterDto> cashRegistersDto = cashRegisters.getContent().stream()

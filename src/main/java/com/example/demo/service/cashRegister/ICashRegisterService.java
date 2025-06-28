@@ -17,7 +17,8 @@ public interface ICashRegisterService {
 
     ApiSuccessDto<Void> CloseCashRegister(ClosedCashRegisterDto cashRegister, Integer id);
 
-    ApiSuccessDto<PageDto<CashRegisterDto>> getAllCashRegisters(int page, int size);
+    ApiSuccessDto<PageDto<CashRegisterDto>> getAllCashRegisters(int page, int size, String sortDirection,
+            String sortBy);
 
     ApiSuccessDto<CashRegisterEnum> getCashRegisterStatus();
 

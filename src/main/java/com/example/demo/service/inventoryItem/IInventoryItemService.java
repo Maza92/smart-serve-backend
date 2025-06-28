@@ -19,4 +19,5 @@ public interface IInventoryItemService {
     ApiSuccessDto<InventoryItemDto> updateInventoryItem(int id, UpdateInventoryItemDto updateDto);
 
     ApiSuccessDto<Void> deleteInventoryItem(int id);
+
 }
