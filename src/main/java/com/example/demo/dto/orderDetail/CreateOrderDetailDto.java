@@ -1,6 +1,6 @@
 package com.example.demo.dto.orderDetail;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
@@ -26,5 +26,5 @@ public class CreateOrderDetailDto {
     private Integer quantity;
 
     @Size(max = 500, message = "{validation.order.detail.modifications.size}")
-    private String modifications;
+    private List<ModificationDto> modifications;
 }

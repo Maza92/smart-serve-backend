@@ -20,6 +20,9 @@ public class UpdateRecipeDto {
     @NotNull(message = "{validation.recipe.inventoryItemId.notNull}")
     Integer inventoryItemId;
 
+    @NotNull
+    Integer unitId;
+
     @NotNull(message = "{validation.recipe.quantityRequired.notNull}")
     @Positive(message = "{validation.recipe.quantityRequired.positive}")
     BigDecimal quantityRequired;

@@ -18,6 +18,7 @@ import com.example.demo.dto.data.BatchSaveResultDto;
 import com.example.demo.dto.inventory.UpdateInventoryItemStockDto;
 import com.example.demo.dto.inventory.UpdateInventoryItemsStockBatchDto;
 import com.example.demo.dto.orderDetail.CreateOrderDetailDto;
+import com.example.demo.dto.orderDetail.ModificationDto;
 import com.example.demo.entity.DishEntity;
 import com.example.demo.entity.InventoryItemEntity;
 import com.example.demo.entity.InventoryMovementEntity;
@@ -25,6 +26,7 @@ import com.example.demo.entity.OrderDetailEntity;
 import com.example.demo.entity.OrderEntity;
 import com.example.demo.entity.RecipeEntity;
 import com.example.demo.entity.UserEntity;
+import com.example.demo.enums.ModificationTypeEnum;
 import com.example.demo.enums.MovementReasonEnum;
 import com.example.demo.enums.MovementTypeEnum;
 import com.example.demo.enums.ReferenceTypeEnum;
@@ -36,13 +38,18 @@ import com.example.demo.repository.RecipeRepository;
 import com.example.demo.service.data.BatchSaveService;
 import com.example.demo.service.inventory.IInventoryService;
 import com.example.demo.service.securityContext.ISecurityContextService;
+import com.example.demo.service.unitConversion.IUnitConversionService;
 import com.example.demo.utils.MessageUtils;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class InventoryServiceImpl implements IInventoryService {
 
     private final InventoryItemRepository itemRepository;
@@ -50,6 +57,7 @@ public class InventoryServiceImpl implements IInventoryService {
     private final RecipeRepository recipeRepository;
     private final ApiExceptionFactory apiExceptionFactory;
     private final ISecurityContextService securityContextService;
+    private final IUnitConversionService unitConversionService;
     private final BatchSaveService batchSaveService;
     private final MessageUtils messageUtils;
 
@@ -223,34 +231,98 @@ public class InventoryServiceImpl implements IInventoryService {
             List<RecipeEntity> dishRecipe = recipeRepository.findAllByDishWithIngredients(dish.getId());
 
             for (RecipeEntity recipeIngredient : dishRecipe) {
-                InventoryItemEntity item = recipeIngredient.getInventoryItem();
-                BigDecimal quantityToDecrease = recipeIngredient.getQuantityRequired()
-                        .multiply(BigDecimal.valueOf(quantityOrdered));
+                BigDecimal quantityToDecrease = calculateQuantityToDecrease(recipeIngredient, quantityOrdered);
 
-                BigDecimal stockBefore = item.getStockQuantity();
-                BigDecimal stockAfter = stockBefore.subtract(quantityToDecrease);
+                createMovementAndUpdateStock(recipeIngredient.getInventoryItem(),
+                        quantityToDecrease, movements, order);
+            }
 
-                item.setStockQuantity(stockAfter);
-                item.setLastUpdated(Instant.now());
-
-                InventoryMovementEntity movement = new InventoryMovementEntity();
-                movement.setInventoryItem(item);
-                movement.setMovementType(MovementTypeEnum.OUT);
-                movement.setReason(MovementReasonEnum.RECIPE_USAGE);
-                movement.setQuantityChanged(quantityToDecrease);
-                movement.setQuantityBefore(stockBefore);
-                movement.setQuantityAfter(stockAfter);
-                movement.setUnitCostAtTime(item.getUnitCost());
-                movement.setMovementDate(Instant.now());
-                movement.setUser(order.getUser());
-                movement.setReferenceId(order.getId());
-                movement.setReferenceType(ReferenceTypeEnum.ORDER);
-
-                movements.add(movement);
+            if (detail.getModifications() != null) {
+                processModifications(detail.getModifications(), quantityOrdered, movements, order);
             }
         }
 
         movementRepository.saveAll(movements);
+    }
+
+    private BigDecimal calculateQuantityToDecrease(RecipeEntity recipeIngredient, int quantityOrdered) {
+        InventoryItemEntity item = recipeIngredient.getInventoryItem();
+
+        BigDecimal convertedQuantity = unitConversionService.convertUnit(
+                recipeIngredient.getQuantityRequired(),
+                recipeIngredient.getUnit().getId(),
+                item.getUnit().getId());
+
+        return convertedQuantity.multiply(BigDecimal.valueOf(quantityOrdered));
+    }
+
+    private void createMovementAndUpdateStock(InventoryItemEntity item, BigDecimal quantityChange,
+            List<InventoryMovementEntity> movements, OrderEntity order) {
+        BigDecimal stockBefore = item.getStockQuantity();
+        BigDecimal stockAfter = stockBefore.subtract(quantityChange);
+
+        item.setStockQuantity(stockAfter);
+        item.setLastUpdated(Instant.now());
+
+        InventoryMovementEntity movement = new InventoryMovementEntity();
+        movement.setInventoryItem(item);
+        movement.setMovementType(
+                quantityChange.compareTo(BigDecimal.ZERO) > 0 ? MovementTypeEnum.OUT : MovementTypeEnum.IN);
+        movement.setReason(MovementReasonEnum.RECIPE_USAGE);
+        movement.setQuantityChanged(quantityChange.abs());
+        movement.setQuantityBefore(stockBefore);
+        movement.setQuantityAfter(stockAfter);
+        movement.setUnitCostAtTime(item.getUnitCost());
+        movement.setMovementDate(Instant.now());
+        movement.setUser(order.getUser());
+        movement.setReferenceId(order.getId());
+        movement.setReferenceType(ReferenceTypeEnum.ORDER);
+
+        movements.add(movement);
+    }
+
+    private void processModifications(JsonNode modifications, int quantityOrdered,
+            List<InventoryMovementEntity> movements, OrderEntity order) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            ModificationDto[] modificationArray = mapper.treeToValue(modifications, ModificationDto[].class);
+
+            for (ModificationDto modification : modificationArray) {
+                if (modification.getAction() == ModificationTypeEnum.NOTE)
+                    continue;
+
+                InventoryItemEntity item = itemRepository.findById(modification.getInventoryItemId())
+                        .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.inventory.item.not.found"));
+
+                BigDecimal convertedQuantity = unitConversionService.convertUnit(
+                        modification.getQuantityChange(),
+                        modification.getUnitId(),
+                        item.getUnit().getId());
+
+                BigDecimal totalQuantityChange = convertedQuantity.multiply(BigDecimal.valueOf(quantityOrdered));
+
+                switch (modification.getAction()) {
+                    case ADD -> {
+                        createMovementAndUpdateStock(item, totalQuantityChange, movements, order);
+                    }
+                    case REMOVE -> {
+                        createMovementAndUpdateStock(item, totalQuantityChange.negate(), movements, order);
+                    }
+                    case EXTRA -> {
+                        createMovementAndUpdateStock(item, totalQuantityChange, movements, order);
+                    }
+                    case LESS -> {
+                        createMovementAndUpdateStock(item, totalQuantityChange.negate(), movements, order);
+                    }
+                    case NOTE -> {
+                        // Para nota, no hacemos nada. Orientado a acciones de preparación
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error procesando modificaciones: {}", modifications.toString(), e);
+            throw apiExceptionFactory.badRequestException("operation.inventory.update.invalid.modifications");
+        }
     }
 
 }

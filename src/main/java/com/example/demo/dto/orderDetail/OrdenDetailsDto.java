@@ -2,12 +2,13 @@ package com.example.demo.dto.orderDetail;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 public class OrdenDetailsDto {
     private Integer id;
     private Integer orderId;
     private Integer dishId;
-    private String modifications;
+    private List<ModificationDto> modifications;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal finalPrice;

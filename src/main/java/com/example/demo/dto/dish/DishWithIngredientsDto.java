@@ -3,6 +3,7 @@ package com.example.demo.dto.dish;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.example.demo.dto.recipe.IngredientToDishDto;
 import com.example.demo.dto.recipe.IngredientsSummaryDto;
 
 import jakarta.validation.Valid;
@@ -51,5 +52,5 @@ public class DishWithIngredientsDto {
 
     @NotEmpty(message = "{validation.dish.ingredients.notEmpty}")
     @Valid
-    List<IngredientsSummaryDto> ingredients;
+    List<IngredientToDishDto> ingredients;
 }

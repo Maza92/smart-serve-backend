@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import java.math.BigDecimal;
 import java.util.Set;
 
+import com.example.demo.enums.OrderServiceTypeEnum;
 import com.example.demo.enums.OrderStatusEnum;
 
 import jakarta.persistence.CascadeType;
@@ -54,6 +55,13 @@ public class OrderEntity extends BaseAuditEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private OrderStatusEnum status;
+
+    @Column(name = "comments", length = 255, nullable = true)
+    private String comments;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "service_type", nullable = true, length = 20)
+    private OrderServiceTypeEnum serviceType;
 
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;

@@ -3,6 +3,7 @@ package com.example.demo.dto.order;
 import java.util.List;
 
 import com.example.demo.dto.orderDetail.CreateOrderDetailDto;
+import com.example.demo.enums.OrderServiceTypeEnum;
 import com.example.demo.enums.OrderStatusEnum;
 
 import jakarta.validation.Valid;
@@ -25,6 +26,10 @@ public class UpdateOrderWithDetailsDto {
     @NotBlank(message = "{validation.order.customerName.notBlank}")
     @Size(min = 2, max = 100, message = "{validation.order.customerName.size}")
     private String customerName;
+
+    private OrderServiceTypeEnum serviceType;
+
+    private String comments;
 
     @NotEmpty(message = "{validation.order.details.notEmpty}")
     @Valid

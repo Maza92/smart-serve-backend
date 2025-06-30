@@ -24,6 +24,9 @@ public class CreateRecipeToDishDto {
     @Positive(message = "{validation.recipe.quantityRequired.positive}")
     BigDecimal quantityRequired;
 
+    @NotNull
+    Integer unitId;
+
     @Size(max = 500, message = "{validation.recipe.notes.size}")
     String notes;
 

@@ -43,6 +43,10 @@ public class RecipeEntity extends BaseAuditEntity {
     @Column(name = "quantity_required", nullable = false, precision = 10, scale = 3)
     private BigDecimal quantityRequired;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unit_id")
+    private UnitEntity unit;
+
     @Column(name = "notes", length = 255)
     private String notes;
 

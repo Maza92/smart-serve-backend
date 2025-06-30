@@ -1,5 +1,7 @@
 package com.example.demo.dto.orderDetail;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -11,5 +13,5 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class OrderDetailsReponseDto {
     private Integer dishId;
-    private String modifications;
+    private List<ModificationDto> modifications;
 }

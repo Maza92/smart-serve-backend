@@ -1,5 +1,7 @@
 package com.example.demo.dto.orderDetail;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -15,5 +17,5 @@ public class OrderDetailToKitchenDto {
     private String dishName;
     private String categoryName;
     private String estimatedPreparationTime;
-    private String modifications;
+    private List<ModificationDto> modifications;
 }

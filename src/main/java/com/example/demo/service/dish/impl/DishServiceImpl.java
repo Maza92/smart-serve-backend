@@ -17,6 +17,7 @@ import com.example.demo.dto.api.ApiSuccessDto;
 import com.example.demo.dto.api.PageDto;
 import com.example.demo.dto.dish.CreateDishDto;
 import com.example.demo.dto.dish.DishDto;
+import com.example.demo.dto.dish.DishIngredientsDto;
 import com.example.demo.dto.dish.DishWithIngredientsDto;
 import com.example.demo.dto.dish.DishWithRecipesDto;
 import com.example.demo.dto.dish.UpdateDishDto;
@@ -25,14 +26,20 @@ import com.example.demo.entity.CategoryEntity;
 import com.example.demo.entity.DishEntity;
 import com.example.demo.entity.InventoryItemEntity;
 import com.example.demo.entity.RecipeEntity;
+import com.example.demo.entity.UnitEntity;
 import com.example.demo.exception.ApiExceptionFactory;
 import com.example.demo.mappers.IDishMapper;
+import com.example.demo.mappers.IInventoryItemMapper;
 import com.example.demo.mappers.IRecipeMapper;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.DishRepository;
 import com.example.demo.repository.InventoryItemRepository;
 import com.example.demo.repository.RecipeRepository;
+import com.example.demo.repository.UnitRepository;
 import com.example.demo.service.dish.IDishService;
+import com.example.demo.service.inventory.IInventoryService;
+import com.example.demo.service.inventoryItem.IInventoryItemService;
+import com.example.demo.service.recipe.IRecipeService;
 import com.example.demo.specifications.DishSpecifications;
 import com.example.demo.utils.MessageUtils;
 
@@ -46,7 +53,11 @@ public class DishServiceImpl implements IDishService {
         private final CategoryRepository categoryRepository;
         private final RecipeRepository recipeRepository;
         private final InventoryItemRepository inventoryItemRepository;
+        private final IInventoryItemService inventoryItemService;
+        private final IRecipeService recipeService;
         private final IDishMapper dishMapper;
+        private final IInventoryItemMapper inventoryItemMapper;
+        private final UnitRepository unitRepository;
         private final IRecipeMapper recipeMapper;
         private final MessageUtils messageUtils;
         private final ApiExceptionFactory apiExceptionFactory;
@@ -75,9 +86,13 @@ public class DishServiceImpl implements IDishService {
                 dish.setCategory(category);
                 dishRepository.save(dish);
 
+                Map<Integer, UnitEntity> unitsMap = unitRepository.findAllByIsBaseUnit(false).stream()
+                                .collect(Collectors.toMap(UnitEntity::getId, Function.identity()));
+
                 List<RecipeEntity> recipes = request.getIngredients().stream()
                                 .map(ingredient -> {
                                         RecipeEntity entity = recipeMapper.toEntity(ingredient);
+                                        entity.setUnit(unitsMap.get(ingredient.getUnitId()));
                                         entity.setDish(dish);
                                         return entity;
                                 })
@@ -151,9 +166,10 @@ public class DishServiceImpl implements IDishService {
                 DishEntity dish = dishRepository.getDishWithRecipesById(id)
                                 .orElseThrow(() -> apiExceptionFactory.entityNotFound("dish.not.found"));
 
-                System.out.println(dish.getRecipes().stream().toList());
+                System.out.println(dish.getRecipes().stream().map(RecipeEntity::getUnit).toList());
+
                 DishWithIngredientsDto dishDto = dishMapper.toDtoWithIngredients(dish);
-                dishDto.setIngredients(recipeMapper.toIngredientsSummaryDto(dish.getRecipes().stream().toList()));
+                dishDto.setIngredients(recipeMapper.toIngredientsDto(dish.getRecipes().stream().toList()));
                 return ApiSuccessDto.of(HttpStatus.OK.value(),
                                 messageUtils.getMessage("operation.dish.get.by.id.success"),
                                 dishDto);
@@ -209,6 +225,22 @@ public class DishServiceImpl implements IDishService {
                 }
 
                 return foundDishes.stream().collect(Collectors.toMap(DishEntity::getId, Function.identity()));
+        }
+
+        @Override
+        public ApiSuccessDto<List<DishIngredientsDto>> getDishIngredients(int id) {
+                List<RecipeEntity> recipes = recipeService.getRecipesByDishId(id);
+
+                if (recipes.size() == 0)
+                        throw apiExceptionFactory.entityNotFound("operation.dish.ingredients.not.found");
+
+                List<DishIngredientsDto> ingredientsDto = recipes.stream()
+                                .map(recipe -> recipeMapper.toDishIngredientsDto(recipe))
+                                .toList();
+
+                return ApiSuccessDto.of(HttpStatus.OK.value(),
+                                messageUtils.getMessage("operation.dish.get.ingredients.success"),
+                                ingredientsDto);
         }
 
         private Specification<DishEntity> buildSpecification(String search, String category,

@@ -107,6 +107,8 @@ public class OrderServiceImpl implements IOrderService {
                     orderToSend.getStatus().name());
 
         orderToSend.setCustomerName(order.getCustomerName());
+        orderToSend.setComments(order.getComments());
+        orderToSend.setServiceType(order.getServiceType());
         orderToSend.setStatus(OrderStatusEnum.SENT_TO_KITCHEN);
 
         Set<OrderDetailEntity> orderDetails = createOrderDetails(order.getDetails(), orderToSend, dishesMap);
@@ -134,7 +136,7 @@ public class OrderServiceImpl implements IOrderService {
             BigDecimal unitPrice = dish.getBasePrice();
 
             try {
-                orderDetail.setModifications(objectMapper.readTree(detailDto.getModifications()));
+                orderDetail.setModifications(objectMapper.valueToTree(detailDto.getModifications()));
             } catch (Exception e) {
                 apiExceptionFactory.businessException("operation.order.invalid.modification", e.getMessage());
             }
@@ -167,7 +169,10 @@ public class OrderServiceImpl implements IOrderService {
         Page<OrderEntity> orders = orderRepository.findByStatues(statues, pageable);
 
         List<OrderToKitchenDto> ordersToKitchen = orders.getContent().stream()
-                .map(orderMapper::toOrderToKitchenDto)
+                .map(order -> {
+                    OrderToKitchenDto orderToKitchenDto = orderMapper.toOrderToKitchenDto(order);
+                    return orderToKitchenDto;
+                })
                 .toList();
 
         return ApiSuccessDto.of(HttpStatus.OK.value(),

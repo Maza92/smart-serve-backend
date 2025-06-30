@@ -2,7 +2,13 @@ package com.example.demo.entity;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Set;
 
+import org.apache.commons.lang3.builder.ToStringExclude;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
@@ -44,8 +51,9 @@ public class InventoryItemEntity extends BaseAuditEntity {
     @Column(name = "image_path", length = Integer.MAX_VALUE, nullable = false)
     private String imagePath;
 
-    @Column(name = "unit", nullable = false, length = 20)
-    private String unit;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unit_id")
+    private UnitEntity unit;
 
     @Column(name = "stock_quantity", nullable = false, precision = 10, scale = 2)
     private BigDecimal stockQuantity;
@@ -63,6 +71,12 @@ public class InventoryItemEntity extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity category;
+
+    @ToStringExclude
+    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "inventoryItem", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<RecipeEntity> recipes;
 
     @Column(name = "location", length = 100)
     private String location;

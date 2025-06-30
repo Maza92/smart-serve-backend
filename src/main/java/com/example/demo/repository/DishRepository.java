@@ -20,7 +20,7 @@ public interface DishRepository extends JpaRepository<DishEntity, Integer>, JpaS
     @EntityGraph(attributePaths = { "recipes", "recipes.inventoryItem" })
     Page<DishEntity> findAll(Specification<DishEntity> spec, Pageable pageable);
 
-    @EntityGraph(attributePaths = { "recipes", "recipes.inventoryItem" })
+    @EntityGraph(attributePaths = { "recipes", "recipes.inventoryItem", "recipes.unit" })
     @Query("SELECT d FROM DishEntity d WHERE d.id = :id")
     Optional<DishEntity> getDishWithRecipesById(@Param("id") int id);
 
