@@ -63,10 +63,10 @@ public class DishEntity extends BaseAuditEntity {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "dish", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "dish", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<RecipeEntity> recipes;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category", nullable = true)
     private CategoryEntity category;
 
@@ -85,5 +85,4 @@ public class DishEntity extends BaseAuditEntity {
             isFeatured = false;
         }
     }
-
 }

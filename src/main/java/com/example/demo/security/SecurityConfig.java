@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**",
                                 "/v3/api-docs/**", "/ping")
                         .permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptions -> exceptions

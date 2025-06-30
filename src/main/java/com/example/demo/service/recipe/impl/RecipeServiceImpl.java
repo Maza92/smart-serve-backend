@@ -1,11 +1,14 @@
 package com.example.demo.service.recipe.impl;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.api.ApiSuccessDto;
 import com.example.demo.dto.api.PageDto;
@@ -15,7 +18,9 @@ import com.example.demo.dto.recipe.UpdateRecipeDto;
 import com.example.demo.entity.RecipeEntity;
 import com.example.demo.exception.ApiExceptionFactory;
 import com.example.demo.mappers.IRecipeMapper;
+import com.example.demo.repository.InventoryItemRepository;
 import com.example.demo.repository.RecipeRepository;
+import com.example.demo.repository.UnitRepository;
 import com.example.demo.service.recipe.IRecipeService;
 import com.example.demo.utils.MessageUtils;
 
@@ -28,6 +33,8 @@ public class RecipeServiceImpl implements IRecipeService {
     private final RecipeRepository recipeRepository;
     private final IRecipeMapper recipeMapper;
     private final ApiExceptionFactory apiExceptionFactory;
+    private final UnitRepository unitRepository;
+    private final InventoryItemRepository inventoryItemRepository;
     private final MessageUtils messageUtils;
 
     @Override
@@ -66,11 +73,23 @@ public class RecipeServiceImpl implements IRecipeService {
     }
 
     @Override
+    @Transactional
     public ApiSuccessDto<RecipeDto> updateRecipe(int id, UpdateRecipeDto recipe) {
-        RecipeEntity recipeEntity = recipeRepository.findById(id)
+        RecipeEntity recipeEntity = recipeRepository.findByIdWithItemAndUnit(id)
                 .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.recipe.update.not.found"));
 
         recipeMapper.updateEntityFromDto(recipe, recipeEntity);
+
+        if (recipeEntity.getUnit().getId() != recipe.getUnitId()) {
+            recipeEntity.setUnit(unitRepository.findById(recipe.getUnitId())
+                    .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.unit.not.found")));
+        }
+
+        if (recipeEntity.getInventoryItem().getId() != recipe.getInventoryItemId()) {
+            recipeEntity.setInventoryItem(inventoryItemRepository.findById(recipe.getInventoryItemId())
+                    .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.inventory.item.not.found")));
+        }
+
         RecipeEntity savedRecipe = recipeRepository.save(recipeEntity);
 
         return ApiSuccessDto.of(HttpStatus.OK.value(), messageUtils.getMessage("operation.recipe.update.success"),
@@ -85,5 +104,10 @@ public class RecipeServiceImpl implements IRecipeService {
         recipeRepository.delete(recipe);
 
         return ApiSuccessDto.of(HttpStatus.OK.value(), messageUtils.getMessage("operation.recipe.delete.success"));
+    }
+
+    @Override
+    public List<RecipeEntity> getRecipesByDishId(int dishId) {
+        return recipeRepository.findAllByDishId(dishId);
     }
 }

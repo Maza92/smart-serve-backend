@@ -19,11 +19,13 @@ import com.example.demo.dto.inventoryItem.UpdateInventoryItemDto;
 import com.example.demo.entity.CategoryEntity;
 import com.example.demo.entity.InventoryItemEntity;
 import com.example.demo.entity.SupplierEntity;
+import com.example.demo.entity.UnitEntity;
 import com.example.demo.exception.ApiExceptionFactory;
 import com.example.demo.mappers.IInventoryItemMapper;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.InventoryItemRepository;
 import com.example.demo.repository.SupplierRepository;
+import com.example.demo.repository.UnitRepository;
 import com.example.demo.service.inventoryItem.IInventoryItemService;
 import com.example.demo.specifications.InventoryItemSpecifications;
 import com.example.demo.utils.MessageUtils;
@@ -38,6 +40,7 @@ public class InventoryItemServiceImpl implements IInventoryItemService {
         private final SupplierRepository supplierRepository;
         private final CategoryRepository categoryRepository;
         private final IInventoryItemMapper inventoryItemMapper;
+        private final UnitRepository unitRepository;
         private final MessageUtils messageUtils;
         private final ApiExceptionFactory apiExceptionFactory;
 
@@ -113,9 +116,13 @@ public class InventoryItemServiceImpl implements IInventoryItemService {
                 CategoryEntity category = categoryRepository.findById(createDto.getCategoryId())
                                 .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.category.not.found"));
 
+                UnitEntity unit = unitRepository.findById(createDto.getUnitId())
+                                .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.unit.not.found"));
+
                 InventoryItemEntity inventoryItem = inventoryItemMapper.toEntity(createDto);
                 inventoryItem.setSupplier(supplier);
                 inventoryItem.setCategory(category);
+                inventoryItem.setUnit(unit);
                 inventoryItem.setStockQuantity(BigDecimal.ZERO);
 
                 InventoryItemEntity savedInventoryItem = inventoryItemRepository.save(inventoryItem);
@@ -147,11 +154,18 @@ public class InventoryItemServiceImpl implements IInventoryItemService {
                         inventoryItem.setCategory(category);
                 }
 
-                InventoryItemEntity savedInventoryItem = inventoryItemRepository.save(inventoryItem);
+                if (updateDto.getUnitId() != inventoryItem.getUnit().getId()) {
+                        UnitEntity unit = unitRepository.findById(updateDto.getUnitId())
+                                        .orElseThrow(() -> apiExceptionFactory
+                                                        .entityNotFound("operation.unit.not.found"));
+                        inventoryItem.setUnit(unit);
+                }
+
+                inventoryItemRepository.save(inventoryItem);
 
                 return ApiSuccessDto.of(HttpStatus.OK.value(),
                                 messageUtils.getMessage("operation.inventory.item.update.success"),
-                                inventoryItemMapper.toDto(savedInventoryItem));
+                                inventoryItemMapper.toDto(inventoryItem));
         }
 
         @Override
@@ -164,5 +178,10 @@ public class InventoryItemServiceImpl implements IInventoryItemService {
 
                 return ApiSuccessDto.of(HttpStatus.OK.value(),
                                 messageUtils.getMessage("operation.inventory.item.delete.success"), null);
+        }
+
+        @Override
+        public List<InventoryItemEntity> getInventoryItemsByDishId(int dishId) {
+                return inventoryItemRepository.findItemsByDishId(dishId);
         }
 }

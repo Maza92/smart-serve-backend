@@ -10,8 +10,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import javax.management.relation.Role;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -123,13 +121,18 @@ public class UserServiceImpl implements IUserService {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> apiExceptionFactory.entityNotFound("operation.user.update.not.found"));
 
-        userMapper.updateEntityFromDto(userDto, user);
+        System.out.println(userDto.toString());
 
-        if (userDto.getRoleName() != null) {
+        UserEntity updatedUser = userMapper.updateEntityFromDto(userDto, user);
+        System.out.println(updatedUser.toString());
+
+        if (!userDto.getRoleName().equals(user.getRole().getName().name())) {
             RoleEntity role = roleRepository.findByName(RoleEnum.valueOf(userDto.getRoleName().toUpperCase()))
                     .orElseThrow(() -> apiExceptionFactory.entityNotFound("role.not.found"));
-            user.setRole(role);
+            updatedUser.setRole(role);
         }
+
+        System.out.println(updatedUser.toString());
 
         userRepository.save(user);
 

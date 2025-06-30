@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 public class UpdateInventoryItemDto {
     private String name;
     private String imagePath;
-    private String unit;
+    private Integer unitId;
 
     @Positive(message = "{validation.inventory.item.unitCost.positive}")
     private BigDecimal unitCost;

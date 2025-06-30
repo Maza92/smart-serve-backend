@@ -20,7 +20,9 @@ public class InventoryItemDto {
     private Integer id;
     private String name;
     private String imagePath;
-    private String unit;
+    private Integer unitId;
+    private String unitName;
+    private String unitAbbreviation;
     private BigDecimal stockQuantity;
     private BigDecimal unitCost;
     private BigDecimal minStockLevel;

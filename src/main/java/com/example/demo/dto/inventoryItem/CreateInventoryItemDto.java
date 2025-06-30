@@ -26,8 +26,8 @@ public class CreateInventoryItemDto {
     @NotBlank(message = "{validation.inventory.item.imagePath.notBlank}")
     private String imagePath;
 
-    @NotBlank(message = "{validation.inventory.item.unit.notBlank}")
-    private String unit;
+    @NotNull(message = "{validation.inventory.item.unit.notBlank}")
+    private Integer unitId;
 
     @NotNull(message = "{validation.inventory.item.unitCost.notNull}")
     @Positive(message = "{validation.inventory.item.unitCost.positive}")

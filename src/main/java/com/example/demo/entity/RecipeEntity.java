@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "recipe")
-public class RecipeEntity {
+public class RecipeEntity extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "recipe_id_seq")
@@ -32,16 +32,20 @@ public class RecipeEntity {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dish_id", nullable = false)
     private DishEntity dish;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inventory_item_id", nullable = false)
     private InventoryItemEntity inventoryItem;
 
     @Column(name = "quantity_required", nullable = false, precision = 10, scale = 3)
     private BigDecimal quantityRequired;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unit_id")
+    private UnitEntity unit;
 
     @Column(name = "notes", length = 255)
     private String notes;
@@ -51,6 +55,7 @@ public class RecipeEntity {
 
     @PrePersist
     public void prePersist() {
+        super.prePersist();
         if (preparationOrder == null) {
             preparationOrder = 1;
         }
