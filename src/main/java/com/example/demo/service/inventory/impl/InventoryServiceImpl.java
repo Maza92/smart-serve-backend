@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,8 @@ import com.example.demo.dto.api.ApiSuccessDto;
 import com.example.demo.dto.data.BatchSaveResultDto;
 import com.example.demo.dto.inventory.UpdateInventoryItemStockDto;
 import com.example.demo.dto.inventory.UpdateInventoryItemsStockBatchDto;
+import com.example.demo.dto.inventory.dashboard.InventoryMetricsDto;
+import com.example.demo.dto.inventory.dashboard.RecentActivityDto;
 import com.example.demo.dto.orderDetail.CreateOrderDetailDto;
 import com.example.demo.dto.orderDetail.ModificationDto;
 import com.example.demo.entity.DishEntity;
@@ -30,15 +33,18 @@ import com.example.demo.enums.ModificationTypeEnum;
 import com.example.demo.enums.MovementReasonEnum;
 import com.example.demo.enums.MovementTypeEnum;
 import com.example.demo.enums.ReferenceTypeEnum;
+import com.example.demo.enums.UpdateTypeEnum;
 import com.example.demo.exception.ApiExceptionFactory;
 import com.example.demo.repository.DishRepository;
 import com.example.demo.repository.InventoryItemRepository;
 import com.example.demo.repository.InventoryMovementRepository;
 import com.example.demo.repository.RecipeRepository;
 import com.example.demo.service.data.BatchSaveService;
+import com.example.demo.service.data.InventoryMetricsCalculatorService;
 import com.example.demo.service.inventory.IInventoryService;
 import com.example.demo.service.securityContext.ISecurityContextService;
 import com.example.demo.service.unitConversion.IUnitConversionService;
+import com.example.demo.utils.InventoryChangedEvent;
 import com.example.demo.utils.MessageUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,6 +65,9 @@ public class InventoryServiceImpl implements IInventoryService {
     private final ISecurityContextService securityContextService;
     private final IUnitConversionService unitConversionService;
     private final BatchSaveService batchSaveService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final ActivityServiceImpl activityService;
+    private final InventoryMetricsCalculatorService metricsCalculator;
     private final MessageUtils messageUtils;
 
     @Override
@@ -88,12 +97,21 @@ public class InventoryServiceImpl implements IInventoryService {
                 .user(securityContextService.getUser())
                 .build();
 
-        movementRepository.save(movement);
+        InventoryMovementEntity savedMovement = movementRepository.save(movement);
 
         item.setStockQuantity(quantityAfter);
         itemRepository.save(item);
 
-        return ApiSuccessDto.of(HttpStatus.OK.value(), messageUtils.getMessage("operation.inventory.update.success"));
+        RecentActivityDto activity = activityService.mapInventoryMovementToActivity(savedMovement);
+        eventPublisher.publishEvent(new InventoryChangedEvent(this, UpdateTypeEnum.NEW_ACTIVITY, activity));
+
+        if (savedMovement.getInventoryItem().getMinStockLevel().compareTo(quantityAfter) > 0) {
+            InventoryMetricsDto metrics = metricsCalculator.calculateMetrics();
+            eventPublisher.publishEvent(new InventoryChangedEvent(this, UpdateTypeEnum.METRICS_UPDATE, metrics));
+        }
+
+        return ApiSuccessDto.of(HttpStatus.OK.value(),
+                messageUtils.getMessage("operation.inventory.update.success"));
     }
 
     @Override

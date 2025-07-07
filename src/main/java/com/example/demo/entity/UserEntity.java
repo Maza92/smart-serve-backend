@@ -61,4 +61,8 @@ public class UserEntity extends BaseAuditEntity {
 	@ManyToOne
 	@JoinColumn(name = "role_id", nullable = false)
 	private RoleEntity role;
+
+	public String getCompleteNames() {
+		return firstName + " " + lastName;
+	}
 }

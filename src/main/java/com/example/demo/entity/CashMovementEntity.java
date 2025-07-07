@@ -1,10 +1,14 @@
 package com.example.demo.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
+
+import com.example.demo.enums.CashMovementTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -46,22 +50,30 @@ public class CashMovementEntity extends BaseAuditEntity {
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "movement_type", nullable = false, length = 20)
-    private String movementType;
+    private CashMovementTypeEnum movementType;
 
     @Column(name = "reason", length = 255)
     private String reason;
 
     @Column(name = "movement_date", nullable = false)
-    private LocalDateTime movementDate;
+    private Instant movementDate;
 
     @Column(name = "authorized_by", length = 100)
     private String authorizedBy;
 
+    @Column(name = "active", nullable = false)
+    private Boolean active;
+
     @PrePersist
     public void prePersist() {
+        super.prePersist();
         if (movementDate == null) {
-            movementDate = LocalDateTime.now();
+            movementDate = Instant.now();
+        }
+        if (active == null) {
+            active = true;
         }
     }
 }

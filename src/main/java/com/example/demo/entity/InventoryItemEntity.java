@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.ToStringExclude;
@@ -77,6 +78,9 @@ public class InventoryItemEntity extends BaseAuditEntity {
     @OneToMany(mappedBy = "inventoryItem", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<RecipeEntity> recipes;
+
+    @OneToMany(mappedBy = "inventoryItem")
+    private List<InventoryMovementEntity> inventoryMovements;
 
     @Column(name = "location", length = 100)
     private String location;
