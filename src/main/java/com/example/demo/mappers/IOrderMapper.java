@@ -1,5 +1,7 @@
 package com.example.demo.mappers;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -8,6 +10,7 @@ import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 import com.example.demo.dto.order.CreateDraftOrderResponseDto;
+import com.example.demo.dto.order.OrderDto;
 import com.example.demo.dto.order.OrderToKitchenDto;
 import com.example.demo.dto.order.UpdateOrderToKitchenDto;
 import com.example.demo.dto.order.UpdateOrderWithDetailsResponseDto;
@@ -33,4 +36,13 @@ public interface IOrderMapper {
     OrderToKitchenDto toOrderToKitchenDto(OrderEntity order);
 
     UpdateOrderToKitchenDto toUpdateOrderToKitchenDto(OrderEntity order);
+
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "userName", source = "user.username")
+    @Mapping(target = "tableNumber", source = "table.number")
+    @Mapping(target = "tableId", source = "table.id")
+    @Mapping(target = "orderDetails", source = "orderDetails")
+    OrderDto toOrderDto(OrderEntity order);
+
+    List<OrderDto> toOrderDto(List<OrderEntity> orders);
 }

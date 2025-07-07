@@ -2,13 +2,20 @@ package com.example.demo.dto.orderDetail;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 
-public class OrdenDetailsDto {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+@Data
+@ToString
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = false)
+public class OrderDetailsDto {
     private Integer id;
-    private Integer orderId;
     private Integer dishId;
-    private List<ModificationDto> modifications;
+    private String dishName;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal finalPrice;

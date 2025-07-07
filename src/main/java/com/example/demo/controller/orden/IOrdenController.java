@@ -12,11 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.demo.annotation.AcceptLanguageHeader;
+import com.example.demo.dto.Invoice.InvoiceDto;
 import com.example.demo.dto.api.ApiSuccessDto;
 import com.example.demo.dto.api.PageDto;
 import com.example.demo.dto.order.CreateDraftOrderDto;
 import com.example.demo.dto.order.CreateDraftOrderResponseDto;
+import com.example.demo.dto.order.OrderDto;
 import com.example.demo.dto.order.OrderToKitchenDto;
+import com.example.demo.dto.order.TotalSalesDto;
 import com.example.demo.dto.order.UpdateOrderWithDetailsDto;
 import com.example.demo.dto.order.UpdateOrderWithDetailsResponseDto;
 
@@ -106,4 +109,86 @@ public interface IOrdenController {
         ResponseEntity<ApiSuccessDto<PageDto<OrderToKitchenDto>>> getOrdersToKitchen(
                         @RequestParam(name = "page", defaultValue = "1") int page,
                         @RequestParam(name = "size", defaultValue = "10") int size);
+
+        @AcceptLanguageHeader
+        @SecurityRequirement(name = "Auth")
+        @Operation(summary = "Get order complete by table", description = "Get an order that is complete")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)))
+        })
+        @GetMapping("/{tableId}/complete")
+        ResponseEntity<ApiSuccessDto<OrderDto>> getActualOrderCompleteByTable(
+                        @PathVariable("tableId") Integer tableId);
+
+        @AcceptLanguageHeader
+        @SecurityRequirement(name = "Auth")
+        @Operation(summary = "Get order account", description = "Get an order that is in payment")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)))
+        })
+        @GetMapping("/{orderId}/account")
+        ResponseEntity<ApiSuccessDto<InvoiceDto>> getOrderAccount(
+                        @PathVariable("orderId") Integer orderId);
+
+        @AcceptLanguageHeader
+        @SecurityRequirement(name = "Auth")
+        @Operation(summary = "Pay order", description = "Pay an order that is in payment")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)))
+        })
+        @PutMapping("/{orderId}/pay")
+        ResponseEntity<ApiSuccessDto<Void>> payOrder(
+                        @PathVariable("orderId") Integer orderId);
+
+        @AcceptLanguageHeader
+        @SecurityRequirement(name = "Auth")
+        @Operation(summary = "Serve order", description = "Serve an order that is ready")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)))
+        })
+        @PutMapping("/{orderId}/serve")
+        ResponseEntity<ApiSuccessDto<Void>> serveOrder(
+                        @PathVariable("orderId") Integer orderId);
+
+        @AcceptLanguageHeader
+        @SecurityRequirement(name = "Auth")
+        @Operation(summary = "Mark order as finalized", description = "Mark an order that is finalized")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)))
+        })
+        @PutMapping("/{orderId}/mark-as-finalized")
+        ResponseEntity<ApiSuccessDto<Void>> MarkOrderAsFinalized(
+                        @PathVariable("orderId") Integer orderId);
+
+        @AcceptLanguageHeader
+        @SecurityRequirement(name = "Auth")
+        @Operation(summary = "Get today sales", description = "Get today sales")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)))
+        })
+        @GetMapping("/today-sales")
+        ResponseEntity<ApiSuccessDto<TotalSalesDto>> GetTodaySales();
 }

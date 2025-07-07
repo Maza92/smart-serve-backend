@@ -1,0 +1,15 @@
+package com.example.demo.enums;
+
+public enum ActivityTypeEnum {
+    INVENTORY_PURCHASE,
+    RECIPE_USAGE,
+    INVENTORY_ADJUSTMENT,
+    INVENTORY_EXPIRY,
+    INVENTORY_DAMAGE,
+    INVENTORY_TRANSFER,
+    ORDER_COMPLETED,
+    ORDER_PAY,
+    LOW_STOCK_ALERT,
+    CATEGORY_CREATED,
+    ITEM_CREATED
+}
