@@ -106,4 +106,17 @@ public interface IUserController {
         @SecurityRequirement(name = "Auth")
         ResponseEntity<ApiSuccessDto<ImportResultDto>> importUsersAsync(
                         @RequestParam("file") @Schema(type = "string", format = "binary", description = "The file to upload") MultipartFile file);
+
+        @GetMapping("/me")
+        @AcceptLanguageHeader
+        @Operation(summary = "Get current user", description = "Gets the current user")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "User retrieved successfully", content = {
+                                        @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)) }),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Unexpected error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class)))
+        })
+        @SecurityRequirement(name = "Auth")
+        ResponseEntity<ApiSuccessDto<UserDto>> me();
 }

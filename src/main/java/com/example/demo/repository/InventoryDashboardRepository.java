@@ -93,22 +93,23 @@ public interface InventoryDashboardRepository extends JpaRepository<InventoryIte
     Integer countActiveCategoriesAtDate(@Param("date") Instant date);
 
     @Query("""
-            SELECT new com.example.demo.dto.inventory.dashboard.CategoryStockLevelDto(
-                c.name,
-                CASE
-                    WHEN SUM(i.minStockLevel) > 0 THEN
-                        (SUM(i.stockQuantity) * 100.0 / SUM(i.minStockLevel))
-                    ELSE 100.0
-                END,
-                COUNT(i),
-                SUM(CASE WHEN i.stockQuantity <= i.minStockLevel THEN 1 ELSE 0 END),
-                SUM(i.stockQuantity * i.unitCost)
-            )
-            FROM CategoryEntity c
-            LEFT JOIN InventoryItemEntity i ON c.id = i.category.id AND i.isActive = true
-            WHERE c.isActive = true
-            GROUP BY c.id, c.name
-            ORDER BY c.name
+                  SELECT new com.example.demo.dto.inventory.dashboard.CategoryStockLevelDto(
+                      c.name,
+                      CASE
+                          WHEN COUNT(i.id) > 0 THEN
+                              (SUM(CASE WHEN i.stockQuantity > i.minStockLevel THEN 1 ELSE 0 END) * 100.0 / COUNT(i.id))
+                          ELSE
+                              100.0
+                      END,
+                      COUNT(i.id),
+                      SUM(CASE WHEN i.stockQuantity <= i.minStockLevel THEN 1 ELSE 0 END),
+                      COALESCE(SUM(i.stockQuantity * i.unitCost), 0.0)
+                  )
+                  FROM CategoryEntity c
+                  LEFT JOIN InventoryItemEntity i ON c.id = i.category.id AND i.isActive = true
+                  WHERE c.isActive = true
+                  GROUP BY c.id, c.name
+                  ORDER BY c.name
             """)
     List<CategoryStockLevelDto> getCategoryStockLevels();
 }

@@ -52,4 +52,9 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 	public Claims getClaims() {
 		return claims;
 	}
+
+	@Override
+	public String getName() {
+		return claims.getSubject();
+	}
 }

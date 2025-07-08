@@ -52,6 +52,7 @@ import com.example.demo.service.Invoice.IInvoiceService;
 import com.example.demo.service.cashRegister.ICashRegisterService;
 import com.example.demo.service.dish.IDishService;
 import com.example.demo.service.inventory.IInventoryService;
+import com.example.demo.service.notifications.INotificationsService;
 import com.example.demo.service.order.IOrderService;
 import com.example.demo.service.parameter.IParameterService;
 import com.example.demo.service.restaurantTable.IRestaurantTableService;
@@ -74,6 +75,7 @@ public class OrderServiceImpl implements IOrderService {
         private final IRestaurantTableService restaurantTableService;
         private final IStompMessagingService stompMessagingService;
         private final IParameterService parameterService;
+        private final INotificationsService notificationsService;
         private final MessageUtils messageUtils;
         private final RestaurantTableRepository restaurantTableRepository;
         private final ICashRegisterService cashRegisterService;
@@ -228,6 +230,8 @@ public class OrderServiceImpl implements IOrderService {
                 orderRepository.save(order);
                 sendUpdateMessageToKitchen(order);
                 inventoryService.updateStockForOrder(order);
+
+                notificationsService.createOrderReadyNotification(order);
                 return ApiSuccessDto.of(HttpStatus.OK.value(),
                                 messageUtils.getMessage("operation.order.ready.order"),
                                 null);

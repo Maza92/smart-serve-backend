@@ -23,5 +23,7 @@ public interface IUserService {
 
     ApiSuccessDto<ImportResultDto> importUsers(InputStream inputStream);
 
+    ApiSuccessDto<UserDto> me();
+
     CompletableFuture<ApiSuccessDto<ImportResultDto>> importUsersAsync(InputStream inputStream);
 }

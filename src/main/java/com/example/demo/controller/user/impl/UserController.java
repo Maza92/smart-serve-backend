@@ -73,4 +73,10 @@ public class UserController implements IUserController {
             throw apiExceptionFactory.badRequestException("operation.user.import.invalid.file");
         }
     }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'CASHIER', 'WAITER', 'COOK', 'BAKER')")
+    public ResponseEntity<ApiSuccessDto<UserDto>> me() {
+        return ResponseEntity.ok(userService.me());
+    }
 }
