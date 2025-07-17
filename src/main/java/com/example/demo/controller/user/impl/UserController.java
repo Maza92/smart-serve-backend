@@ -42,7 +42,7 @@ public class UserController implements IUserController {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'CASHIER', 'WAITER', 'COOK', 'BAKER')")
     public ResponseEntity<ApiSuccessDto<UserDto>> getUserById(int id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
