@@ -25,8 +25,11 @@ public class RestaurantTableControllerImpl implements IRestaurantTableController
     private final IRestaurantTableService restaurantTableService;
 
     @Override
-    public ResponseEntity<ApiSuccessDto<PageDto<RestaurantTableDto>>> getAllRestaurantTables(int page, int size) {
-        return ResponseEntity.ok(restaurantTableService.getAllRestaurantTables(page, size));
+    public ResponseEntity<ApiSuccessDto<PageDto<RestaurantTableDto>>> getAllRestaurantTables(int page, int size,
+            String number,
+            String status, String section, String sortBy, String sortDirection) {
+        return ResponseEntity.ok(restaurantTableService.getAllRestaurantTables(page, size, number, status, section,
+                sortBy, sortDirection));
     }
 
     @Override

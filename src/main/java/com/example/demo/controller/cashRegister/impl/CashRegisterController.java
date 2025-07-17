@@ -47,8 +47,9 @@ public class CashRegisterController implements ICashRegisterController {
     }
 
     @Override
-    public ResponseEntity<ApiSuccessDto<PageDto<CashRegisterDto>>> getAllCashRegisters(int page, int size) {
-        return ResponseEntity.ok(cashRegisterService.getAllCashRegisters(page, size));
+    public ResponseEntity<ApiSuccessDto<PageDto<CashRegisterDto>>> getAllCashRegisters(int page, int size,
+            String sortDirection, String sortBy) {
+        return ResponseEntity.ok(cashRegisterService.getAllCashRegisters(page, size, sortDirection, sortBy));
     }
 
     @Override

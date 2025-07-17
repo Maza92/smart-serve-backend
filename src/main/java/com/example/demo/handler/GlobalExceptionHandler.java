@@ -19,6 +19,7 @@ import com.example.demo.exception.exceptions.AlreadyExistsException;
 import com.example.demo.exception.exceptions.AuthException;
 import com.example.demo.exception.exceptions.BadRequestException;
 import com.example.demo.exception.exceptions.BusinessException;
+import com.example.demo.exception.exceptions.DataImportException;
 import com.example.demo.exception.exceptions.EntityException;
 import com.example.demo.exception.exceptions.EntityNotFoundException;
 import com.example.demo.exception.exceptions.ValidationException;
@@ -127,7 +128,10 @@ public class GlobalExceptionHandler {
 			return HttpStatus.BAD_REQUEST;
 		} else if (ex instanceof BadRequestException) {
 			return HttpStatus.BAD_REQUEST;
+		} else if (ex instanceof DataImportException) {
+			return HttpStatus.BAD_REQUEST;
 		}
+
 		return HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 }

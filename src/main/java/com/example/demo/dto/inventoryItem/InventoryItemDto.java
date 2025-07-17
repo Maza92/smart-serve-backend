@@ -19,12 +19,16 @@ import lombok.experimental.Accessors;
 public class InventoryItemDto {
     private Integer id;
     private String name;
-    private String unit;
+    private String imagePath;
+    private Integer unitId;
+    private String unitName;
+    private String unitAbbreviation;
     private BigDecimal stockQuantity;
     private BigDecimal unitCost;
     private BigDecimal minStockLevel;
     private String supplierName;
     private Integer supplierId;
+    private Integer categoryId;
     private String location;
     private Instant lastUpdated;
     private Instant expiryDate;

@@ -22,7 +22,7 @@ public class DishDto {
     String name;
     String description;
     BigDecimal basePrice;
-    String category;
+    Integer categoryId;
     String imageUrl;
     BigDecimal preparationTime;
     Boolean isActive;

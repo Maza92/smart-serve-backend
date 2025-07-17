@@ -42,11 +42,11 @@ public class InventoryMovementEntity extends BaseAuditEntity {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inventory_item_id", nullable = false)
     private InventoryItemEntity inventoryItem;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
@@ -85,6 +85,7 @@ public class InventoryMovementEntity extends BaseAuditEntity {
 
     @PrePersist
     public void prePersist() {
+        super.prePersist();
         if (movementDate == null) {
             movementDate = Instant.now();
         }

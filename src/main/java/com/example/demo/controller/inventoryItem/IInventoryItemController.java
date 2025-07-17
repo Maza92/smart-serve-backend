@@ -47,6 +47,20 @@ public interface IInventoryItemController {
                         @RequestParam(defaultValue = "name") String sortBy,
                         @RequestParam(defaultValue = "asc") String sortDirection);
 
+        @GetMapping("/supplier/{supplierId}")
+        @AcceptLanguageHeader
+        @Operation(summary = "Get inventory items by supplier", description = "Gets a paginated list of inventory items by supplier with optional filters")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Inventory items retrieved successfully", content = {
+                                        @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)) }),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))) })
+        @SecurityRequirement(name = "Auth")
+        ResponseEntity<ApiSuccessDto<PageDto<InventoryItemDto>>> getInventoryItemsBySupplier(
+                        @RequestParam(defaultValue = "10") int size,
+                        @RequestParam(defaultValue = "1") int page,
+                        @PathVariable(required = true) int supplierId);
+
         @GetMapping("/{id}")
         @AcceptLanguageHeader
         @Operation(summary = "Get inventory item by ID", description = "Gets an inventory item by its ID")

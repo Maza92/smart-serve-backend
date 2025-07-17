@@ -8,4 +8,10 @@ public interface IInventoryMovementService {
     ApiSuccessDto<PageDto<InventoryMovementDto>> getMovementsByItem(Integer id, Integer page, Integer size);
 
     ApiSuccessDto<PageDto<InventoryMovementDto>> getMovementsByOrder(Integer id, Integer page, Integer size);
+
+    ApiSuccessDto<PageDto<InventoryMovementDto>> getMovementsByUser(Integer id, Integer page, Integer size);
+
+    ApiSuccessDto<PageDto<InventoryMovementDto>> getMovementsBySupplier(Integer id, Integer page, Integer size);
+
+    ApiSuccessDto<PageDto<InventoryMovementDto>> getLastMovements(Integer page, Integer size);
 }

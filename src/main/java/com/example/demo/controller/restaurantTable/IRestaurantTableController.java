@@ -17,6 +17,7 @@ import com.example.demo.dto.restaurantTable.RestaurantTableDto;
 import com.example.demo.dto.restaurantTable.UpdateRestaurantTableDto;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,19 +29,31 @@ import jakarta.validation.Valid;
 @Tag(name = "Restaurant Tables", description = "Operations related to restaurant tables")
 public interface IRestaurantTableController {
 
-        @GetMapping
         @AcceptLanguageHeader
-        @Operation(summary = "Retrieves all restaurant tables", description = "Retrieves all restaurant tables")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Restaurant tables retrieved successfully", content = {
-                                        @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class)) }),
-                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
-                        @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class)))
-        })
         @SecurityRequirement(name = "Auth")
+        @Operation(summary = "Get all restaurant tables", description = "Get all restaurant tables")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Success", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiSuccessDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class))),
+                        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorDto.class)))
+        })
+        @GetMapping
+        @Parameter(name = "page", description = "Page number", example = "1")
+        @Parameter(name = "size", description = "Page size", example = "10")
+        @Parameter(name = "number", description = "Restaurant table number", example = "1")
+        @Parameter(name = "status", description = "Restaurant table status", example = "AVAILABLE")
+        @Parameter(name = "section", description = "Restaurant table section", example = "SECTION 1")
+        @Parameter(name = "sortBy", description = "Sort by field", example = "id")
+        @Parameter(name = "sortDirection", description = "Sort direction", example = "asc")
         ResponseEntity<ApiSuccessDto<PageDto<RestaurantTableDto>>> getAllRestaurantTables(
                         @RequestParam(defaultValue = "1") int page,
-                        @RequestParam(defaultValue = "10") int size);
+                        @RequestParam(defaultValue = "10") int size,
+                        @RequestParam(defaultValue = "") String number,
+                        @RequestParam(defaultValue = "") String status,
+                        @RequestParam(defaultValue = "") String section,
+                        @RequestParam(defaultValue = "id") String sortBy,
+                        @RequestParam(defaultValue = "asc") String sortDirection);
 
         @PostMapping
         @AcceptLanguageHeader

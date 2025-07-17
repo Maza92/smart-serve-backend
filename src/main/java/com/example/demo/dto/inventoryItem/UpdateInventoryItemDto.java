@@ -19,7 +19,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class UpdateInventoryItemDto {
     private String name;
-    private String unit;
+    private String imagePath;
+    private Integer unitId;
 
     @Positive(message = "{validation.inventory.item.unitCost.positive}")
     private BigDecimal unitCost;
@@ -28,6 +29,7 @@ public class UpdateInventoryItemDto {
     private BigDecimal minStockLevel;
 
     private Integer supplierId;
+    private Integer categoryId;
     private String location;
     private Instant expiryDate;
     private Boolean isActive;

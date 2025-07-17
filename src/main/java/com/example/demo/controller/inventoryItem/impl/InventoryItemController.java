@@ -3,6 +3,7 @@ package com.example.demo.controller.inventoryItem.impl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,16 +28,25 @@ public class InventoryItemController implements IInventoryItemController {
     @Override
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ResponseEntity<ApiSuccessDto<PageDto<InventoryItemDto>>> getInventoryItems(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String location,
-            @RequestParam(required = false) String isActive,
-            @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDirection) {
+            int page,
+            int size,
+            String search,
+            String location,
+            String isActive,
+            String sortBy,
+            String sortDirection) {
 
         return ResponseEntity.ok(inventoryItemService.getAllInventoryItems(page, size, search, location, isActive,
                 sortBy, sortDirection));
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<ApiSuccessDto<PageDto<InventoryItemDto>>> getInventoryItemsBySupplier(
+            int size,
+            int page,
+            int supplierId) {
+        return ResponseEntity.ok(inventoryItemService.getAllInventoryItemsBySupplier(supplierId, page, size));
     }
 
     @Override
@@ -48,7 +58,7 @@ public class InventoryItemController implements IInventoryItemController {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiSuccessDto<InventoryItemDto>> createInventoryItem(
-            CreateInventoryItemDto createInventoryItemDto) {
+            @RequestBody CreateInventoryItemDto createInventoryItemDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(inventoryItemService.createInventoryItem(createInventoryItemDto));
     }
@@ -56,7 +66,7 @@ public class InventoryItemController implements IInventoryItemController {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiSuccessDto<InventoryItemDto>> updateInventoryItem(int id,
-            UpdateInventoryItemDto updateInventoryItemDto) {
+            @RequestBody UpdateInventoryItemDto updateInventoryItemDto) {
         return ResponseEntity.ok(inventoryItemService.updateInventoryItem(id, updateInventoryItemDto));
     }
 

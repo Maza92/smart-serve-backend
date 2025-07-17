@@ -1,14 +1,21 @@
 package com.example.demo.entity;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.example.demo.enums.PaymentMethodEnum;
+import com.example.demo.enums.TransactionStatusEnum;
+import com.example.demo.enums.TransactionTypeEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -50,29 +57,40 @@ public class TransactionEntity extends BaseAuditEntity {
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false, length = 30)
-    private String paymentMethod;
+    private PaymentMethodEnum paymentMethod;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false, length = 20)
-    private String transactionType;
+    private TransactionTypeEnum transactionType;
 
     @Column(name = "reference_number", length = 50)
     private String referenceNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private String status;
+    private TransactionStatusEnum status;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "payment_details", columnDefinition = "jsonb")
     private Map<String, Object> paymentDetails;
 
     @Column(name = "transaction_date", nullable = false)
-    private LocalDateTime transactionDate;
+    private Instant transactionDate;
+
+    @Column(name = "active", nullable = false)
+    private boolean active;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @PrePersist
     public void prePersist() {
+        super.prePersist();
         if (transactionDate == null) {
-            transactionDate = LocalDateTime.now();
+            transactionDate = Instant.now();
         }
     }
 }

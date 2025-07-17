@@ -14,5 +14,5 @@ import lombok.experimental.Accessors;
 public class RecipeSummaryDto {
     private String name;
     private BigDecimal quantityRequired;
-    private String unit;
+    private Integer unitId;
 }
