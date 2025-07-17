@@ -26,7 +26,6 @@ public class CreateRestaurantTableDto {
     public String status;
 
     @Size(max = 50, message = "{validation.restaurant.table.section.size}")
-    @Pattern(regexp = "^[a-zA-Z0-9\\s-]*$", message = "{validation.restaurant.table.section.pattern}")
     @Schema(example = "Terraza")
     public String section;
 }

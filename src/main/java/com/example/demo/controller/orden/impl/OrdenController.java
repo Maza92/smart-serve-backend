@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/order")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class OrdenController implements IOrdenController {
 
     private final IOrderService orderService;

@@ -220,6 +220,12 @@ public class UserServiceImpl implements IUserService {
                 finalResult);
     }
 
+    @Override
+    public ApiSuccessDto<UserDto> me() {
+        UserEntity currentUser = securityContextService.getUser();
+        return ApiSuccessDto.of(HttpStatus.OK.value(), "operation.user.me.success", userMapper.toDto(currentUser));
+    }
+
     @Async
     @Override
     public CompletableFuture<ApiSuccessDto<ImportResultDto>> importUsersAsync(InputStream inputStream) {

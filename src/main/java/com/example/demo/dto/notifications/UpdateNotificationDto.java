@@ -1,7 +1,5 @@
 package com.example.demo.dto.notifications;
 
-import com.example.demo.enums.NotificationTypeEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,13 +13,7 @@ import lombok.experimental.Accessors;
 @Setter
 @ToString
 @Accessors(chain = true)
-public class NotificationDto {
-    Integer id;
-    String message;
-    String type;
-    boolean isRead;
-    String relatedEntityType;
-    Integer relatedEntityId;
-    Integer userId;
-    String userName;
+public class UpdateNotificationDto {
+    private Integer id;
+    private Boolean isRead;
 }
